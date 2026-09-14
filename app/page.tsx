@@ -1,14 +1,22 @@
+import { Show, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#f4f1eb] text-[#1d2623]">
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-10" aria-label="Primary navigation">
-        <a className="flex items-center gap-2 text-xl font-semibold tracking-[-0.04em]" href="/" aria-label="Formly home">
+        <Link className="flex items-center gap-2 text-xl font-semibold tracking-[-0.04em]" href="/" aria-label="Formly home">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1d2623] font-serif text-lg italic text-[#f4f1eb]">f</span>
           <span>formly</span>
-        </a>
+        </Link>
         <div className="flex items-center gap-6 text-sm font-medium">
-          <a className="transition-colors hover:text-[#d96445]" href="/sign-in">Sign in</a>
-          <a className="rounded-full bg-[#1d2623] px-5 py-3 text-[#f4f1eb] transition-transform hover:-translate-y-0.5" href="/sign-up">Get started <span aria-hidden="true">↗</span></a>
+          <Show when="signed-out">
+            <Link className="transition-colors hover:text-[#d96445]" href="/sign-in">Sign in</Link>
+            <Link className="rounded-full bg-[#1d2623] px-5 py-3 text-[#f4f1eb] transition-transform hover:-translate-y-0.5" href="/sign-up">Get started <span aria-hidden="true">↗</span></Link>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
         </div>
       </nav>
 
@@ -17,7 +25,7 @@ export default function Home() {
           <p className="mb-7 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#d96445]"><span className="h-2 w-2 rounded-full bg-[#d96445]" /> Form creation, simplified</p>
           <h1 className="max-w-lg text-6xl font-medium leading-[0.95] tracking-[-0.07em] sm:text-7xl">Build forms that feel <em className="font-serif font-normal text-[#d96445]">effortless.</em></h1>
           <p className="mt-7 max-w-md text-lg leading-8 text-[#65716c]">Drag, drop, and ship beautiful forms in minutes. Formly gives your ideas a clear path from first question to final response.</p>
-          <div className="mt-9 flex flex-wrap items-center gap-6"><a className="rounded-full bg-[#1d2623] px-6 py-4 text-sm font-semibold text-[#f4f1eb] transition-transform hover:-translate-y-0.5" href="/sign-up">Create a form <span aria-hidden="true">↗</span></a><a className="text-sm font-semibold underline decoration-[#c8cec8] underline-offset-8 transition-colors hover:text-[#d96445]" href="#preview">See how it works <span aria-hidden="true">↓</span></a></div>
+          <div className="mt-9 flex flex-wrap items-center gap-6"><Link className="rounded-full bg-[#1d2623] px-6 py-4 text-sm font-semibold text-[#f4f1eb] transition-transform hover:-translate-y-0.5" href="/sign-up">Create a form <span aria-hidden="true">↗</span></Link><a className="text-sm font-semibold underline decoration-[#c8cec8] underline-offset-8 transition-colors hover:text-[#d96445]" href="#preview">See how it works <span aria-hidden="true">↓</span></a></div>
           <p className="mt-6 text-xs font-medium text-[#8b948f]">No credit card required <span className="px-2">·</span> Free to start</p>
         </div>
 
