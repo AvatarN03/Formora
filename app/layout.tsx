@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { LayoutProps } from "@/types";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Formly | Forms that feel effortless",
-  description: "Build beautiful forms in minutes with Formly.",
+  title: "Form Drag | Drag and Drop Form Builder",
+  description: "Build beautiful forms with an intuitive drag-and-drop interface. Create custom form layouts effortlessly.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
