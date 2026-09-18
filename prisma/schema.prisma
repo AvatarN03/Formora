@@ -1,5 +1,34 @@
-// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+}
+
+model Form {
+  id     Int    @id @default(autoincrement())
+  userId String
+
+  createdAt   DateTime @default(now())
+  published   Boolean  @default(false)
+  name        String
+  description String   @default("")
+  content     String   @default("[]")
+
+  visits      Int @default(0)
+  submissions Int @default(0)
+
+  // shareURL is a unique identifier for the form that can be used to share it with others (public)
+  shareURL        String           @default(uuid())
+  formSubmissions FormSubmission[]
+}
+
+model FormSubmission {
+  id        Int      @id @default(autoincrement())
+  formId    Int
+  createdAt DateTime @default(now())
+  content   String
+
+  form Form @relation(fields: [formId], references: [id])
 }

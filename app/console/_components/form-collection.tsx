@@ -1,0 +1,216 @@
+import Link from "next/link";
+
+import { formatDistanceToNow } from "date-fns";
+import {
+  ArrowRight,
+  BarChart2,
+  Eye,
+  FileText,
+  Plus,
+  Search,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import prisma from "@/lib/prisma";
+
+interface FormCollectionProps {
+  userId: string;
+}
+
+export async function FormCollection({ userId }: FormCollectionProps) {
+  const forms = await prisma.form.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const allCount = forms.length;
+  const publishedCount = forms.filter((form) => form.published).length;
+  const draftsCount = allCount - publishedCount;
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+      {/* Subheader Filters */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-border/50 bg-muted/20 px-4 py-2.5">
+        <div className="flex items-center gap-1 text-xs">
+          <span className="px-2.5 py-1 rounded-md bg-background text-foreground font-medium border border-border/60 shadow-xs">
+            All forms ({allCount})
+          </span>
+          <span className="px-2.5 py-1 rounded-md text-muted-foreground">
+            Published ({publishedCount})
+          </span>
+          <span className="px-2.5 py-1 rounded-md text-muted-foreground">
+            Drafts ({draftsCount})
+          </span>
+        </div>
+
+        <div className="relative w-full sm:w-60">
+          <Search className="size-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Filter by name..."
+            className="w-full h-7 rounded-md border border-border/60 bg-background pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary"
+          />
+        </div>
+      </div>
+
+      {forms.length === 0 ? (
+        /* Empty State */
+        <div className="py-14 px-4 text-center">
+          <div className="size-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mx-auto mb-3">
+            <FileText className="size-5" />
+          </div>
+          <h2 className="text-sm font-medium text-foreground">
+            No forms created yet
+          </h2>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+            Create your first form using the visual drag-and-drop builder, or jumpstart with one of the quick presets below.
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              className={buttonVariants({ size: "sm" })}
+            >
+              <Plus className="size-3.5" />
+              <span>Create first form</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Form Cards Grid */
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {forms.map((form) => {
+            const completionRate =
+              form.visits > 0
+                ? `${((form.submissions / form.visits) * 100).toFixed(0)}%`
+                : "0%";
+
+            return (
+              <div
+                key={form.id}
+                className="group flex flex-col justify-between rounded-xl border border-border/60 bg-card/60 p-4 hover:border-primary/50 hover:bg-card/90 transition-all shadow-xs"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                      {form.name}
+                    </h3>
+                    {form.published ? (
+                      <Badge
+                        variant="secondary"
+                        className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px]"
+                      >
+                        Published
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="border-border text-muted-foreground text-[10px]"
+                      >
+                        Draft
+                      </Badge>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-muted-foreground line-clamp-2 min-h-8">
+                    {form.description || "No description provided."}
+                  </p>
+
+                  <div className="mt-3 text-[11px] text-muted-foreground/70 font-mono">
+                    Created {formatDistanceToNow(new Date(form.createdAt), { addSuffix: true })}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-border/40 space-y-3">
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div className="rounded-md bg-muted/40 p-1.5">
+                      <div className="flex items-center justify-center gap-1 text-muted-foreground text-[10px]">
+                        <Eye className="size-3" />
+                        <span>Visits</span>
+                      </div>
+                      <span className="font-semibold text-foreground text-xs">
+                        {form.visits.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="rounded-md bg-muted/40 p-1.5">
+                      <div className="flex items-center justify-center gap-1 text-muted-foreground text-[10px]">
+                        <BarChart2 className="size-3" />
+                        <span>Replies</span>
+                      </div>
+                      <span className="font-semibold text-foreground text-xs">
+                        {form.submissions.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="rounded-md bg-muted/40 p-1.5">
+                      <div className="text-muted-foreground text-[10px]">Rate</div>
+                      <span className="font-semibold text-foreground text-xs">
+                        {completionRate}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 text-xs">
+                    <Link
+                      href={`/forms/${form.id}`}
+                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-xs"
+                    >
+                      <span>Submissions</span>
+                      <ArrowRight className="size-3" />
+                    </Link>
+
+                    <Link
+                      href={`/builder/${form.id}`}
+                      className={buttonVariants({ variant: "outline", size: "sm" })}
+                    >
+                      <span>Edit form</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FormCollectionSkeleton() {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+      <div className="border-b border-border/50 bg-muted/20 px-4 py-2.5 flex items-center justify-between">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-6 w-40" />
+      </div>
+      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, idx) => (
+          <div
+            key={idx}
+            className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-4 w-14" />
+            </div>
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-3 w-24" />
+            <div className="grid grid-cols-3 gap-2 pt-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
