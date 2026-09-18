@@ -4,6 +4,8 @@ export default function SignUpPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#090a10] px-6 py-12">
       <SignUp
+        fallbackRedirectUrl="/console"
+        forceRedirectUrl="/console"
         appearance={{
           variables: {
             colorPrimary: "#f97316",
