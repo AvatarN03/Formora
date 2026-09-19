@@ -82,3 +82,22 @@ export const createForm = async (data: FormValues) => {
   revalidatePath("/console");
   redirect(`/builder/${form.id}`);
 }
+
+
+export const getFormById = async (id: string) => {
+  const { userId } = await auth();
+
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
+
+    const form = await prisma.form.findUnique({
+        where: { id: Number(id), userId },
+    });
+
+    if (!form) {
+        throw new Error("Form not found");
+    }
+
+    return form;
+};

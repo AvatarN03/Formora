@@ -1,9 +1,21 @@
 import React from 'react'
 
-const FormBuilder = () => {
+import { getFormById } from '@/actions/form'
+
+import FormBuilder from '@/components/FormBuilder'
+
+const FormBuilderPage = async ({
+    params
+}:{
+    params: { id: string }
+}) => {
+
+    const { id } = await params;
+    const form = await getFormById(id);
+    
   return (
-    <div>FormBuilder</div>
+    <FormBuilder form={form} />
   )
 }
 
-export default FormBuilder
+export default FormBuilderPage
