@@ -2,40 +2,42 @@ import Link from "next/link";
 
 import { formatDistanceToNow } from "date-fns";
 import {
-  ArrowRight,
   BarChart2,
+  ClipboardList,
   Eye,
   FileText,
-  Plus,
+  Pencil,
   Search,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import prisma from "@/lib/prisma";
+import { getForms } from "@/actions/form";
+import CreateForm from "./createForm";
 
 interface FormCollectionProps {
   userId: string;
 }
 
 export async function FormCollection({ userId }: FormCollectionProps) {
-  const forms = await prisma.form.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const forms = await getForms(userId);
 
   const allCount = forms.length;
   const publishedCount = forms.filter((form) => form.published).length;
   const draftsCount = allCount - publishedCount;
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
       {/* Subheader Filters */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-border/50 bg-muted/20 px-4 py-2.5">
         <div className="flex items-center gap-1 text-xs">
@@ -62,24 +64,18 @@ export async function FormCollection({ userId }: FormCollectionProps) {
 
       {forms.length === 0 ? (
         /* Empty State */
-        <div className="py-14 px-4 text-center">
-          <div className="size-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mx-auto mb-3">
+        <div className="py-14 px-4 text-left">
+          <div className="size-10 rounded-md bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mb-3">
             <FileText className="size-5" />
           </div>
           <h2 className="text-sm font-medium text-foreground">
             No forms created yet
           </h2>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+          <p className="text-xs text-muted-foreground max-w-sm mt-1">
             Create your first form using the visual drag-and-drop builder, or jumpstart with one of the quick presets below.
           </p>
           <div className="mt-4 flex items-center justify-center gap-2">
-            <button
-              type="button"
-              className={buttonVariants({ size: "sm" })}
-            >
-              <Plus className="size-3.5" />
-              <span>Create first form</span>
-            </button>
+            <CreateForm />
           </div>
         </div>
       ) : (
@@ -92,15 +88,16 @@ export async function FormCollection({ userId }: FormCollectionProps) {
                 : "0%";
 
             return (
-              <div
+              <Card
                 key={form.id}
-                className="group flex flex-col justify-between rounded-xl border border-border/60 bg-card/60 p-4 hover:border-primary/50 hover:bg-card/90 transition-all shadow-xs"
+                size="sm"
+                className="rounded-md border border-border/60 bg-card/60 hover:border-primary/50 hover:bg-card/90 transition-all shadow-xs"
               >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                <CardHeader className="p-4 pb-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="truncate text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                       {form.name}
-                    </h3>
+                    </CardTitle>
                     {form.published ? (
                       <Badge
                         variant="secondary"
@@ -118,16 +115,16 @@ export async function FormCollection({ userId }: FormCollectionProps) {
                     )}
                   </div>
 
-                  <p className="text-xs text-muted-foreground line-clamp-2 min-h-8">
+                  <CardDescription className="line-clamp-2 min-h-8 text-xs">
                     {form.description || "No description provided."}
-                  </p>
+                  </CardDescription>
 
                   <div className="mt-3 text-[11px] text-muted-foreground/70 font-mono">
                     Created {formatDistanceToNow(new Date(form.createdAt), { addSuffix: true })}
                   </div>
-                </div>
+                </CardHeader>
 
-                <div className="mt-4 pt-3 border-t border-border/40 space-y-3">
+                <CardContent className="p-4 pt-3">
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div className="rounded-md bg-muted/40 p-1.5">
                       <div className="flex items-center justify-center gap-1 text-muted-foreground text-[10px]">
@@ -156,25 +153,35 @@ export async function FormCollection({ userId }: FormCollectionProps) {
                       </span>
                     </div>
                   </div>
+                </CardContent>
 
-                  <div className="flex items-center justify-between gap-2 text-xs">
+                <CardFooter className="border-t border-border/40 p-4 pt-3">
+                  <div className="flex w-full gap-2">
                     <Link
                       href={`/forms/${form.id}`}
-                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-xs"
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "sm",
+                        className: "flex-1",
+                      })}
                     >
-                      <span>Submissions</span>
-                      <ArrowRight className="size-3" />
+                      <ClipboardList className="size-3.5" />
+                      <span>Responses</span>
                     </Link>
 
                     <Link
                       href={`/builder/${form.id}`}
-                      className={buttonVariants({ variant: "outline", size: "sm" })}
+                      className={buttonVariants({
+                        size: "sm",
+                        className: "flex-1",
+                      })}
                     >
+                      <Pencil className="size-3.5" />
                       <span>Edit form</span>
                     </Link>
                   </div>
-                </div>
-              </div>
+                </CardFooter>
+              </Card>
             );
           })}
         </div>
@@ -185,7 +192,7 @@ export async function FormCollection({ userId }: FormCollectionProps) {
 
 export function FormCollectionSkeleton() {
   return (
-    <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
       <div className="border-b border-border/50 bg-muted/20 px-4 py-2.5 flex items-center justify-between">
         <Skeleton className="h-6 w-48" />
         <Skeleton className="h-6 w-40" />
@@ -194,7 +201,7 @@ export function FormCollectionSkeleton() {
         {Array.from({ length: 3 }).map((_, idx) => (
           <div
             key={idx}
-            className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-3"
+            className="rounded-md border border-border/60 bg-card/60 p-4 space-y-3"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-4 w-28" />
@@ -213,4 +220,3 @@ export function FormCollectionSkeleton() {
     </div>
   );
 }
-

@@ -144,10 +144,12 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2.5 text-base font-semibold tracking-tight">
-              <span className="flex size-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-                f
-              </span>
-              <span className="font-medium text-foreground tracking-tight">formly</span>
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/11213/11213073.png"
+                alt="Formora logo"
+                className="size-7 rounded-md object-cover"
+              />
+              <span className="font-medium text-foreground tracking-tight">formora</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-muted-foreground">
@@ -554,7 +556,7 @@ export default function Home() {
                     Response recorded
                   </h3>
                   <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                    This demonstrates the actual respondent submission flow in Formly. No redirects, no friction.
+                    This demonstrates the actual respondent submission flow in Formora. No redirects, no friction.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
@@ -713,7 +715,7 @@ export default function Home() {
               Form infrastructure without the clutter.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Every design choice in Formly prioritizes submission completion over flashy gimmicks.
+              Every design choice in Formora prioritizes submission completion over flashy gimmicks.
             </p>
           </div>
 
@@ -763,7 +765,7 @@ export default function Home() {
                 Engineered for teams who care about the details.
               </h2>
               <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                Formly pairs the convenience of drag-and-drop with developer-grade execution.
+                Formora pairs the convenience of drag-and-drop with developer-grade execution.
                 Authentication is protected by Clerk, layouts are styled with Tailwind 4, and database records map 1:1 with Prisma schemas.
               </p>
 
@@ -840,7 +842,7 @@ export default function Home() {
             <span className="flex size-5 items-center justify-center rounded bg-primary text-[10px] font-semibold text-primary-foreground">
               f
             </span>
-            <span className="font-medium text-foreground">formly</span>
+                <span className="font-medium text-foreground">formora</span>
             <span className="text-border">·</span>
             <span>Quiet, focused form builder for modern teams</span>
           </div>
