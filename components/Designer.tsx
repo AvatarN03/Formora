@@ -2,8 +2,15 @@
 
 import { useDragDropMonitor, useDragOperation } from "@dnd-kit/react";
 import { Fragment, useState } from "react";
+import { Trash2 } from "lucide-react";
 
-import { FormElements, type ElementsType, type FormElementInstance } from "@/components/FormElements";
+import {
+  FormElements,
+  FormFieldElements,
+  LayoutElements,
+  type ElementsType,
+  type FormElementInstance,
+} from "@/components/FormElements";
 
 import DesignerDropZone from "./DesignerDropZone";
 import DesignerSidebar from "./DesignerSidebar";
@@ -14,6 +21,7 @@ const Designer = () => {
     isDesignerElement?: boolean;
   }>();
   const [elements, setElements] = useState<FormElementInstance[]>([]);
+  const [selectedElementId, setSelectedElementId] = useState<string>();
 
   useDragDropMonitor<{
     type?: ElementsType;
@@ -38,14 +46,14 @@ const Designer = () => {
       const elementType = data.type;
       const insertionIndex = Number(targetId.replace("designer-drop-", ""));
 
-      if (!Number.isInteger(insertionIndex)) {
+      if (!Number.isInteger(insertionIndex) || insertionIndex < 0) {
         return;
       }
 
       setElements((currentElements) => {
         const nextElements = [...currentElements];
         nextElements.splice(
-          insertionIndex,
+          Math.min(insertionIndex, nextElements.length),
           0,
           FormElements[elementType].constuct(crypto.randomUUID()),
         );
@@ -56,6 +64,8 @@ const Designer = () => {
 
   const activeType = source?.data.isDesignerElement ? source.data.type : undefined;
   const activeElement = activeType ? FormElements[activeType] : undefined;
+  const selectedInstance = elements.find(({ id }) => id === selectedElementId);
+  const selectedElement = selectedInstance ? FormElements[selectedInstance.type] : undefined;
   const isDragging = Boolean(activeElement);
 
   return (
@@ -75,7 +85,24 @@ const Designer = () => {
               const DesignerComponent = FormElements[element.type].designerComponent;
               return (
                 <Fragment key={element.id}>
-                  <DesignerComponent />
+                  <div
+                    className={`group relative w-full cursor-pointer rounded-md transition-all ${selectedElementId === element.id ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:ring-1 hover:ring-primary/60"}`}
+                    onClick={() => setSelectedElementId(element.id)}
+                  >
+                    <DesignerComponent element={element} />
+                    <button
+                      type="button"
+                      aria-label={`Delete ${FormElements[element.type].designerBtn.label}`}
+                      className="absolute right-2 top-2 z-10 hidden rounded-md border border-destructive/40 bg-background p-1.5 text-destructive shadow-sm group-hover:block"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setElements((currentElements) => currentElements.filter(({ id }) => id !== element.id));
+                        setSelectedElementId((currentId) => currentId === element.id ? undefined : currentId);
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                   <DesignerDropZone
                     id={`designer-drop-${index + 1}`}
                     formElement={activeElement}
@@ -92,7 +119,16 @@ const Designer = () => {
         </div>
       </div>
       <DesignerSidebar
-        formElements={[FormElements.TextField, FormElements.H1, FormElements.H2]}
+        layoutElements={LayoutElements}
+        formElements={FormFieldElements}
+        selectedElement={selectedElement}
+        selectedInstance={selectedInstance}
+        onUpdateElement={(updatedElement) => {
+          setElements((currentElements) => currentElements.map((element) => (
+            element.id === updatedElement.id ? updatedElement : element
+          )));
+        }}
+        onBack={() => setSelectedElementId(undefined)}
       />
     </div>
   );

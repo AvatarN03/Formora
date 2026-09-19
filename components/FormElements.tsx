@@ -1,9 +1,41 @@
-import { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
 import { H1FormElement, H2FormElement } from "./fields/Heading"
+import {
+    CheckboxFormElement,
+    DatePickerFormElement,
+    NumberFieldFormElement,
+    ParagraphFormElement,
+    RadioFormElement,
+    SelectFormElement,
+    SeparatorFormElement,
+    SpacerFormElement,
+} from "./fields/Basic"
 import { TextFieldFormElement } from "./fields/TextField"
 
-export type ElementsType = 'TextField' | 'H1' | 'H2'
+export type ElementsType =
+    | "TextField"
+    | "H1"
+    | "H2"
+    | "Paragraph"
+    | "Separator"
+    | "Spacer"
+    | "DatePicker"
+    | "Select"
+    | "NumberField"
+    | "Checkbox"
+    | "Radio"
 
+export type FormElementInstance = {
+    id: string
+    type: ElementsType
+    extraAttributes?: Record<string, unknown>
+}
+
+export type ElementComponentProps = {
+    element: FormElementInstance
+    updateElement?: (element: FormElementInstance) => void
+}
 
 export type FormElement = {
     type: ElementsType
@@ -15,15 +47,9 @@ export type FormElement = {
         label: string
     }
 
-    designerComponent: React.FC
-    propertiesComponent: React.FC
+    designerComponent: React.FC<ElementComponentProps>
+    propertiesComponent: React.FC<ElementComponentProps>
     formComponent: React.FC
-}
-
-export type FormElementInstance = {
-    id: string
-    type: ElementsType
-    extraAttributes?: Record<string, unknown>
 }
 
 type FormElementType = {
@@ -34,4 +60,29 @@ export const FormElements: FormElementType = {
     TextField: TextFieldFormElement,
     H1: H1FormElement,
     H2: H2FormElement,
+    Paragraph: ParagraphFormElement,
+    Separator: SeparatorFormElement,
+    Spacer: SpacerFormElement,
+    DatePicker: DatePickerFormElement,
+    Select: SelectFormElement,
+    NumberField: NumberFieldFormElement,
+    Checkbox: CheckboxFormElement,
+    Radio: RadioFormElement,
 }
+
+export const LayoutElements: FormElement[] = [
+    FormElements.H1,
+    FormElements.H2,
+    FormElements.Paragraph,
+    FormElements.Separator,
+    FormElements.Spacer,
+]
+
+export const FormFieldElements: FormElement[] = [
+    FormElements.TextField,
+    FormElements.DatePicker,
+    FormElements.Select,
+    FormElements.NumberField,
+    FormElements.Checkbox,
+    FormElements.Radio,
+]
