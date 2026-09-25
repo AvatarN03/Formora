@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { MessageSquare, Sparkles, Send, RefreshCw, CheckCircle2, User, Bot, Layout, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 type ThemeType = "obsidian" | "neon" | "emerald" | "amber";
@@ -241,16 +241,16 @@ export function InteractiveChatScene() {
             >
               <RefreshCw className="size-3.5" /> Reset
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="text-xs border-orange-500/30 hover:bg-orange-500/10 text-orange-400 gap-1.5"
+            <Link
+              href="/console"
+              className={buttonVariants({
+                variant: "outline",
+                size: "sm",
+                className: "text-xs border-orange-500/30 hover:bg-orange-500/10 text-orange-400 gap-1.5",
+              })}
             >
-              <Link href="/console">
-                <Layout className="size-3.5" /> Console <ArrowRight className="size-3" />
-              </Link>
-            </Button>
+              <Layout className="size-3.5" /> Console <ArrowRight className="size-3" />
+            </Link>
           </div>
         </div>
 
@@ -374,11 +374,15 @@ export function InteractiveChatScene() {
                 <span>Form Scene configured! Explore full creation & response analytics in the Console.</span>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                <Button size="sm" asChild className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white gap-2 shadow-lg">
-                  <Link href="/console">
-                    Launch Console <ArrowRight className="size-3.5" />
-                  </Link>
-                </Button>
+                <Link
+                  href="/console"
+                  className={buttonVariants({
+                    size: "sm",
+                    className: "w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white gap-2 shadow-lg",
+                  })}
+                >
+                  Launch Console <ArrowRight className="size-3.5" />
+                </Link>
               </div>
             </div>
           )}

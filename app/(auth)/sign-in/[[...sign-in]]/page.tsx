@@ -10,11 +10,6 @@ export default function SignInPage() {
           variables: {
             colorPrimary: "#f97316",
             colorBackground: "#121422",
-            colorText: "#f3f4f6",
-            colorTextSecondary: "#9ca3af",
-            colorInputBackground: "#090a10",
-            colorInputText: "#f3f4f6",
-            colorNeutral: "#9ca3af",
             borderRadius: "0.75rem",
           },
           elements: {

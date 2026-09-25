@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 export default function BuilderError({
   reset,
@@ -22,9 +22,9 @@ export default function BuilderError({
           <Button type="button" onClick={reset}>
             Try again
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/console">Back to console</Link>
-          </Button>
+          <Link href="/console" className={buttonVariants({ variant: "outline" })}>
+            Back to console
+          </Link>
         </div>
       </div>
     </main>
