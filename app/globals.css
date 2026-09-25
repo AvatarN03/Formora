@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+[data-landing] a,
+[data-landing] button {
+  cursor: pointer;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease,
+    transform 180ms ease, opacity 180ms ease;
+}
+
+[data-landing] button:disabled {
+  cursor: not-allowed;
+}
+
+[data-landing] .landing-reveal,
+[data-landing] .landing-hero-item {
+  will-change: transform, opacity;
+}
+
+[data-landing] .rounded-2xl {
+  border-radius: 0.75rem;
+}
+
+[data-landing] .rounded-xl {
+  border-radius: 0.625rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-landing] a,
+  [data-landing] button {
+    transition: none;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

@@ -52,7 +52,7 @@ export default function CreateForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="rounded-md text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4 py-2.5">
+      <DialogTrigger className="cursor-pointer rounded-md text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4 py-2.5">
         Create form
       </DialogTrigger>
 

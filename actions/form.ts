@@ -101,3 +101,29 @@ export const getFormById = async (id: string) => {
 
     return form;
 };
+
+export const updateFormName = async (id: string, name: string) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    throw new Error("Form name is required");
+  }
+
+  const form = await prisma.form.updateMany({
+    where: { id: Number(id), userId },
+    data: { name: trimmedName },
+  });
+
+  if (form.count === 0) {
+    throw new Error("Form not found");
+  }
+
+  revalidatePath(`/builder/${id}`);
+  revalidatePath("/console");
+  return trimmedName;
+};

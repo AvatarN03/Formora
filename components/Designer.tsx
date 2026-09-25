@@ -107,6 +107,7 @@ const Designer = () => {
                     id={`designer-drop-${index + 1}`}
                     formElement={activeElement}
                     isDragging={isDragging}
+                    isBottom={index === elements.length - 1}
                   />
                 </Fragment>
               );

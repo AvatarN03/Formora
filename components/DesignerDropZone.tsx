@@ -9,12 +9,14 @@ interface DesignerDropZoneProps {
   id: string;
   formElement?: FormElement;
   isDragging: boolean;
+  isBottom?: boolean;
 }
 
 export default function DesignerDropZone({
   id,
   formElement,
   isDragging,
+  isBottom = false,
 }: DesignerDropZoneProps) {
   const { isDropTarget, ref } = useDroppable({ id });
   const Icon = formElement?.designerBtn.icon;
@@ -23,12 +25,14 @@ export default function DesignerDropZone({
     <div
       ref={ref}
       className={cn(
-        "flex min-h-3 w-full shrink-0 items-center justify-center rounded-md transition-all",
+        "flex w-full shrink-0 items-center justify-center rounded-md transition-all",
         isDropTarget
           ? "h-20 border border-dashed border-primary/60 bg-primary/5"
-          : isDragging
-            ? "h-10 border border-dashed border-border/60"
-            : "h-3",
+          : isDragging && isBottom
+            ? "min-h-24 border border-dashed border-border/60"
+            : isDragging
+              ? "h-10 border border-dashed border-border/60"
+              : "h-3",
       )}
     >
       {isDropTarget && formElement && Icon ? (

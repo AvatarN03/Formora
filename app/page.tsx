@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { buttonVariants } from "@/components/ui/button";
 import {
-  GripVertical,
   ChevronUp,
   ChevronDown,
   Trash2,
@@ -19,8 +20,9 @@ import {
   Zap,
   CornerDownRight,
   Database,
-  Layers,
 } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface FormFieldItem {
   id: string;
@@ -65,6 +67,39 @@ const INITIAL_FIELDS: FormFieldItem[] = [
 
 export default function Home() {
   const { isSignedIn } = useUser();
+  const landingRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const context = gsap.context(() => {
+      gsap.from(".landing-hero-item", {
+        y: 28,
+        autoAlpha: 0,
+        duration: 0.85,
+        stagger: 0.1,
+        ease: "power3.out",
+      });
+
+      gsap.utils.toArray<HTMLElement>(".landing-reveal").forEach((element) => {
+        gsap.from(element, {
+          y: 32,
+          autoAlpha: 0,
+          duration: 0.75,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 86%",
+            once: true,
+          },
+        });
+      });
+    }, landingRef);
+
+    return () => context.revert();
+  }, []);
 
   // Interactive Workbench State
   const [fields, setFields] = useState<FormFieldItem[]>(INITIAL_FIELDS);
@@ -138,10 +173,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-primary/25 selection:text-foreground">
+    <main ref={landingRef} data-landing className="min-h-screen bg-background text-foreground selection:bg-primary/25 selection:text-foreground">
       {/* -------------------- HEADER -------------------- */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+        <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2.5 text-base font-semibold tracking-tight">
               <img
@@ -157,21 +192,15 @@ export default function Home() {
                 Workbench
               </a>
               <a href="#architecture" className="hover:text-foreground transition-colors">
-                Architecture
+                Design principles
               </a>
               <a href="#specifications" className="hover:text-foreground transition-colors">
-                Specs
+                Specifications
               </a>
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href={isSignedIn ? "/console" : "/sign-in"}
-              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-            >
-              {isSignedIn ? "Console" : "Sign in"}
-            </Link>
             <Link
               href={isSignedIn ? "/console" : "/sign-in"}
               className={buttonVariants({ size: "sm" })}
@@ -184,9 +213,9 @@ export default function Home() {
       </header>
 
       {/* -------------------- HERO SECTION -------------------- */}
-      <section className="relative mx-auto max-w-7xl px-6 pt-16 pb-12 lg:px-10 lg:pt-24 lg:pb-16">
+      <section className="landing-reveal relative mx-auto max-w-7xl px-5 pt-14 pb-10 sm:px-6 lg:px-10 lg:pt-24 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-          <div>
+          <div className="landing-hero-item">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 px-3 py-1 text-[11px] font-mono text-muted-foreground">
               <span className="size-1.5 rounded-full bg-primary" />
               <span>FORM BUILDER & COMPILER</span>
@@ -223,7 +252,7 @@ export default function Home() {
           </div>
 
           {/* Quick Technical Specs Table */}
-          <div className="rounded-2xl border border-border/60 bg-card/40 p-6 backdrop-blur-sm">
+          <div className="landing-hero-item rounded-lg border border-border/60 bg-card/40 p-5 backdrop-blur-sm sm:p-6">
             <div className="flex items-center justify-between border-b border-border/60 pb-3 text-xs font-mono text-muted-foreground">
               <span>SYSTEM SPECIFICATION</span>
               <span className="text-emerald-500 flex items-center gap-1.5">
@@ -255,8 +284,8 @@ export default function Home() {
       </section>
 
       {/* -------------------- INTERACTIVE WORKBENCH -------------------- */}
-      <section id="workbench" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-        <div className="rounded-2xl border border-border/80 bg-card shadow-2xl shadow-black/40 overflow-hidden">
+      <section id="workbench" className="landing-reveal mx-auto max-w-7xl px-5 py-10 sm:px-6 lg:px-10 lg:py-12">
+        <div className="rounded-lg border border-border/80 bg-card shadow-2xl shadow-black/40 overflow-hidden">
           {/* Workbench Title Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 bg-muted/30 px-5 py-3.5">
             <div className="flex items-center gap-3">
@@ -274,7 +303,7 @@ export default function Home() {
             <div className="flex items-center rounded-lg border border-border/70 bg-background/80 p-0.5">
               <button
                 onClick={() => setViewMode("builder")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`flex cursor-pointer items-center gap-1.5 rounded px-3 py-1 text-xs font-medium transition-colors ${
                   viewMode === "builder"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -285,7 +314,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setViewMode("preview")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`flex cursor-pointer items-center gap-1.5 rounded px-3 py-1 text-xs font-medium transition-colors ${
                   viewMode === "preview"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -296,7 +325,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setViewMode("schema")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`flex cursor-pointer items-center gap-1.5 rounded px-3 py-1 text-xs font-medium transition-colors ${
                   viewMode === "schema"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -470,7 +499,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-6 flex items-center justify-between pt-4 border-t border-border/40 text-xs font-mono text-muted-foreground">
-                  <span>Press field to configure properties</span>
+                  <span>Select a field to configure its properties</span>
                   <span className="text-primary flex items-center gap-1.5">
                     <Check className="size-3.5" /> Auto-sync active
                   </span>
@@ -705,7 +734,7 @@ export default function Home() {
       </section>
 
       {/* -------------------- ARCHITECTURAL TENETS -------------------- */}
-      <section id="architecture" className="border-t border-border/50 bg-card/20 py-20">
+      <section id="architecture" className="landing-reveal border-t border-border/50 bg-card/20 py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="max-w-2xl mb-16">
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-2">
@@ -754,7 +783,7 @@ export default function Home() {
       </section>
 
       {/* -------------------- SPECIFICATIONS & DETAILS -------------------- */}
-      <section id="specifications" className="border-t border-border/50 py-20">
+      <section id="specifications" className="landing-reveal border-t border-border/50 py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div>
@@ -812,7 +841,7 @@ export default function Home() {
       </section>
 
       {/* -------------------- CALLOUT SECTION -------------------- */}
-      <section className="border-t border-border/50 bg-muted/20 py-16">
+      <section className="landing-reveal border-t border-border/50 bg-muted/20 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
             <h3 className="text-xl font-medium tracking-tight text-foreground">
