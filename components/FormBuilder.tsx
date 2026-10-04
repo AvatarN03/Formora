@@ -21,6 +21,7 @@ const FormBuilder = ({ form }: { form: Form }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isPublished, setIsPublished] = useState(form.published);
   const [elements, setElements] = useState<FormElementInstance[]>([]);
 
   const saveFormName = async () => {
@@ -84,10 +85,14 @@ const FormBuilder = ({ form }: { form: Form }) => {
               )}
               <div className="flex items-center gap-2">
               <PreviewDialogBtn onClick={() => setIsPreviewing((current) => !current)} />
-              {!form.published && (
+              {!isPublished && (
                 <>
-                  <SaveFormBtn />
-                  <PublishFormBtn />
+                  <SaveFormBtn formId={String(form.id)} elements={elements} />
+                  <PublishFormBtn
+                    formId={String(form.id)}
+                    elements={elements}
+                    onPublished={() => setIsPublished(true)}
+                  />
                 </>
               )}
               </div>

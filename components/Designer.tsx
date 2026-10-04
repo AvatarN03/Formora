@@ -129,7 +129,7 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
         selectedElement={selectedElement}
         selectedInstance={selectedInstance}
         onUpdateElement={(updatedElement) => {
-          setElements((currentElements) => currentElements.map((element) => (
+          onElementsChange((currentElements) => currentElements.map((element) => (
             element.id === updatedElement.id ? updatedElement : element
           )));
         }}

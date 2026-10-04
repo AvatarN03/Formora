@@ -90,15 +90,17 @@ export default function FormPreview({
 }: {
   form: Pick<Form, "name" | "description">;
   elements: FormElementInstance[];
-  onBack: () => void;
+  onBack?: () => void;
 }) {
   return (
     <section className="mx-auto w-full max-w-2xl rounded-sm border border-border/70 bg-card p-6 shadow-xl sm:p-8">
       <div className="mb-6 flex items-center justify-between gap-4">
-        <button type="button" onClick={onBack} className="inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-          <ArrowLeft className="size-4" />
-          Back to builder
-        </button>
+        {onBack ? (
+          <button type="button" onClick={onBack} className="inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <ArrowLeft className="size-4" />
+            Back to builder
+          </button>
+        ) : <span />}
         <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Preview mode</span>
       </div>
 

@@ -102,6 +102,18 @@ export const getFormById = async (id: string) => {
     return form;
 };
 
+export const getPublishedFormByShareURL = async (shareURL: string) => {
+  const form = await prisma.form.findFirst({
+    where: { shareURL, published: true },
+  });
+
+  if (!form) {
+    throw new Error("Published form not found");
+  }
+
+  return form;
+};
+
 export const updateFormName = async (id: string, name: string) => {
   const { userId } = await auth();
 
@@ -126,4 +138,67 @@ export const updateFormName = async (id: string, name: string) => {
   revalidatePath(`/builder/${id}`);
   revalidatePath("/console");
   return trimmedName;
+};
+
+function validateContent(content: string) {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (!Array.isArray(parsed)) {
+      throw new Error("Invalid form content");
+    }
+  } catch {
+    throw new Error("Invalid form content");
+  }
+}
+
+export const saveFormContent = async (id: string, content: string) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  validateContent(content);
+
+  const result = await prisma.form.updateMany({
+    where: { id: Number(id), userId },
+    data: { content },
+  });
+
+  if (result.count === 0) {
+    throw new Error("Form not found");
+  }
+
+  revalidatePath(`/builder/${id}`);
+  revalidatePath(`/builder/${id}/preview`);
+};
+
+export const publishForm = async (id: string, content: string) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  validateContent(content);
+
+  const result = await prisma.form.updateMany({
+    where: { id: Number(id), userId },
+    data: { content, published: true },
+  });
+
+  if (result.count === 0) {
+    throw new Error("Form not found");
+  }
+
+  const form = await prisma.form.findFirst({
+    where: { id: Number(id), userId },
+    select: { shareURL: true },
+  });
+
+  revalidatePath(`/builder/${id}`);
+  revalidatePath(`/builder/${id}/preview`);
+  revalidatePath("/console");
+
+  return form?.shareURL ?? "";
 };
