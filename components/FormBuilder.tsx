@@ -12,12 +12,16 @@ import { updateFormName } from "@/actions/form";
 
 import Designer from "@/components/Designer";
 import DragOverlayWrapper from "@/components/DragOverlayWrapper";
+import type { FormElementInstance } from "@/components/FormElements";
+import FormPreview from "@/components/FormPreview";
 
 const FormBuilder = ({ form }: { form: Form }) => {
   const [formName, setFormName] = useState(form.name);
   const [draftName, setDraftName] = useState(form.name);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [elements, setElements] = useState<FormElementInstance[]>([]);
 
   const saveFormName = async () => {
     const nextName = draftName.trim();
@@ -79,7 +83,7 @@ const FormBuilder = ({ form }: { form: Form }) => {
                 </button>
               )}
               <div className="flex items-center gap-2">
-              <PreviewDialogBtn />
+              <PreviewDialogBtn onClick={() => setIsPreviewing((current) => !current)} />
               {!form.published && (
                 <>
                   <SaveFormBtn />
@@ -89,9 +93,15 @@ const FormBuilder = ({ form }: { form: Form }) => {
               </div>
             </div>
           </nav>
-          <div className="flex min-h-0 grow w-full relative overflow-y-auto bg-background form-builder-container p-8">
-            <Designer />
-            <DragOverlayWrapper />
+          <div className="form-builder-container relative flex min-h-150 w-full grow overflow-y-auto bg-background p-8 lg:min-h-200">
+            {isPreviewing ? (
+              <FormPreview form={form} elements={elements} onBack={() => setIsPreviewing(false)} />
+            ) : (
+              <>
+                <Designer elements={elements} onElementsChange={setElements} />
+                <DragOverlayWrapper />
+              </>
+            )}
           </div>
         </main>
     </DragDropProvider>

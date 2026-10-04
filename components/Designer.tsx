@@ -1,7 +1,7 @@
 "use client";
 
 import { useDragDropMonitor, useDragOperation } from "@dnd-kit/react";
-import { Fragment, useState } from "react";
+import { Fragment, type Dispatch, type SetStateAction, useState } from "react";
 import { Trash2 } from "lucide-react";
 
 import {
@@ -15,12 +15,16 @@ import {
 import DesignerDropZone from "./DesignerDropZone";
 import DesignerSidebar from "./DesignerSidebar";
 
-const Designer = () => {
+interface DesignerProps {
+  elements: FormElementInstance[];
+  onElementsChange: Dispatch<SetStateAction<FormElementInstance[]>>;
+}
+
+const Designer = ({ elements, onElementsChange }: DesignerProps) => {
   const { source } = useDragOperation<{
     type?: ElementsType;
     isDesignerElement?: boolean;
   }>();
-  const [elements, setElements] = useState<FormElementInstance[]>([]);
   const [selectedElementId, setSelectedElementId] = useState<string>();
 
   useDragDropMonitor<{
@@ -50,7 +54,7 @@ const Designer = () => {
         return;
       }
 
-      setElements((currentElements) => {
+      onElementsChange((currentElements) => {
         const nextElements = [...currentElements];
         nextElements.splice(
           Math.min(insertionIndex, nextElements.length),
@@ -96,7 +100,7 @@ const Designer = () => {
                       className="absolute right-2 top-2 z-10 hidden rounded-sm border border-destructive/40 bg-background p-1.5 text-destructive shadow-sm group-hover:block"
                       onClick={(event) => {
                         event.stopPropagation();
-                        setElements((currentElements) => currentElements.filter(({ id }) => id !== element.id));
+                        onElementsChange((currentElements) => currentElements.filter(({ id }) => id !== element.id));
                         setSelectedElementId((currentId) => currentId === element.id ? undefined : currentId);
                       }}
                     >
