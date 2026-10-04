@@ -71,7 +71,7 @@ const Designer = () => {
   return (
     <div className="flex h-full w-full">
       <div
-        className={`m-auto flex h-full w-full max-w-230 flex-col items-center justify-start rounded-md border-2 bg-background transition-colors ${isDragging ? "border-primary/60" : "border-primary/50"}`}
+        className={`m-auto flex min-h-[600px] h-full w-full max-w-230 flex-col items-center justify-start rounded-sm border-2 bg-background transition-colors lg:min-h-[800px] ${isDragging ? "border-primary/60" : "border-primary/50"}`}
       >
         <div className="flex w-full flex-col gap-3 p-5">
           <DesignerDropZone
@@ -86,14 +86,14 @@ const Designer = () => {
               return (
                 <Fragment key={element.id}>
                   <div
-                    className={`group relative w-full cursor-pointer rounded-md transition-all ${selectedElementId === element.id ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:ring-1 hover:ring-primary/60"}`}
+                    className={`group relative w-full cursor-pointer rounded-sm transition-all ${selectedElementId === element.id ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:ring-1 hover:ring-primary/60"}`}
                     onClick={() => setSelectedElementId(element.id)}
                   >
                     <DesignerComponent element={element} />
                     <button
                       type="button"
                       aria-label={`Delete ${FormElements[element.type].designerBtn.label}`}
-                      className="absolute right-2 top-2 z-10 hidden rounded-md border border-destructive/40 bg-background p-1.5 text-destructive shadow-sm group-hover:block"
+                      className="absolute right-2 top-2 z-10 hidden rounded-sm border border-destructive/40 bg-background p-1.5 text-destructive shadow-sm group-hover:block"
                       onClick={(event) => {
                         event.stopPropagation();
                         setElements((currentElements) => currentElements.filter(({ id }) => id !== element.id));
@@ -113,7 +113,7 @@ const Designer = () => {
               );
             })
           ) : !activeElement ? (
-            <p className="flex min-h-20 items-center justify-center text-3xl font-bold text-muted-foreground">
+            <p className="flex min-h-20 items-center justify-center text-xl font-semibold text-muted-foreground">
               Drop Here
             </p>
           ) : null}

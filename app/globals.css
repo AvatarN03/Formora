@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 [data-landing] a,
 [data-landing] button {
   cursor: pointer;
@@ -39,6 +47,24 @@
 
 [data-landing] .rounded-lg {
   border-radius: 0.5rem;
+}
+
+.console-page {
+  background-color: #0c0e17;
+  background-image:
+    radial-gradient(circle at 8% 0%, rgba(139, 92, 246, 0.1), transparent 34%),
+    radial-gradient(circle at 92% 18%, rgba(249, 115, 22, 0.07), transparent 30%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 42px;
+}
+
+.console-page [class*="border-border"] {
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--border));
+}
+
+.console-header {
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+  box-shadow: 0 1px 0 rgba(139, 92, 246, 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {

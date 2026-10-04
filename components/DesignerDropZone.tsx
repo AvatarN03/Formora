@@ -25,7 +25,7 @@ export default function DesignerDropZone({
     <div
       ref={ref}
       className={cn(
-        "flex w-full shrink-0 items-center justify-center rounded-md transition-all",
+        "flex w-full shrink-0 items-center justify-center rounded-sm transition-all",
         isDropTarget
           ? "h-20 border border-dashed border-primary/60 bg-primary/5"
           : isDragging && isBottom

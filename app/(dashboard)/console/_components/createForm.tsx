@@ -52,15 +52,15 @@ export default function CreateForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="cursor-pointer rounded-md text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4 py-2.5">
-        Create form
+      <DialogTrigger className="rounded-sm text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4 py-2.5">
+        New form
       </DialogTrigger>
 
-      <DialogContent className="rounded-md sm:max-w-106.25">
+      <DialogContent className="rounded-sm sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle className="text-xl">Create form</DialogTitle>
+          <DialogTitle className="text-xl">Create a new form</DialogTitle>
           <DialogDescription className="text-base">
-            Give your new form a name to get started.
+            Start with a clear name and a short description. You can refine the fields in the builder.
           </DialogDescription>
         </DialogHeader>
 
@@ -71,9 +71,9 @@ export default function CreateForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">Name</FormLabel>
+                  <FormLabel className="text-base">Form name</FormLabel>
                   <FormControl>
-                    <Input className="rounded-md text-base" placeholder="Contact form" {...field} />
+                    <Input className="rounded-sm text-base" placeholder="Customer feedback" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,9 +84,9 @@ export default function CreateForm() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">Description</FormLabel>
+                  <FormLabel className="text-base">What is this form for?</FormLabel>
                   <FormControl>
-                    <Textarea className="rounded-md text-base" placeholder="A simple contact form" {...field} />
+                    <Textarea className="rounded-sm text-base" placeholder="Collect feedback from your customers" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -96,7 +96,7 @@ export default function CreateForm() {
             <DialogFooter>
               <Button
                 type="submit"
-                className="w-full rounded-md text-base"
+                className="w-full rounded-sm text-base"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? (
@@ -107,7 +107,7 @@ export default function CreateForm() {
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Save
+                    Create form
                   </>
                 )}
               </Button>

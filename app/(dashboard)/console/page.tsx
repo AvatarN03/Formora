@@ -14,7 +14,7 @@ export default async function ConsolePage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="console-page min-h-screen">
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
         <div className="flex flex-col gap-3 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>

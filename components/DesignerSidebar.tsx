@@ -24,7 +24,7 @@ const DesignerSidebar = ({
     const PropertiesComponent = selectedElement.propertiesComponent;
 
     return (
-      <aside className="flex h-full w-full max-w-94 grow flex-col gap-4 overflow-y-auto border-l-2 border-muted bg-background p-4">
+      <aside className="flex min-h-[600px] h-full w-full max-w-94 grow flex-col gap-4 overflow-y-auto border-l-2 border-muted bg-background p-4 lg:min-h-[800px]">
         <Button type="button" variant="ghost" className="w-fit gap-2 px-2" onClick={onBack}>
           <ArrowLeft className="size-4" />
           Back to elements
@@ -49,7 +49,7 @@ const DesignerSidebar = ({
   );
 
   return (
-    <aside className="flex h-full w-full max-w-94 grow flex-col gap-3 overflow-y-auto border-l-2 border-muted bg-background p-4">
+    <aside className="flex min-h-[600px] h-full w-full max-w-94 grow flex-col gap-3 overflow-y-auto border-l-2 border-muted bg-background p-4 lg:min-h-[800px]">
       <h3 className="text-sm font-medium text-foreground">Elements</h3>
       <section className="space-y-2">
         <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Layout</h4>

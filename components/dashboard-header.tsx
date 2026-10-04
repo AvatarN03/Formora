@@ -10,8 +10,8 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ name, email }: DashboardHeaderProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6">
+    <header className="console-header sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-md">
+      <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight">
             <img

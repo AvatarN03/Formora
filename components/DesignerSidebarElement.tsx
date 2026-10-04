@@ -29,7 +29,7 @@ export default function DesignerSidebarElement({
             type="button"
             variant="outline"
             className={cn(
-                "h-auto min-h-16 flex-col gap-2 border-border/60 px-3 py-3 text-xs",
+                "h-auto min-h-16 rounded-sm flex-col gap-2 border-border/60 px-3 py-3 text-xs",
                 "hover:border-primary/60 hover:bg-primary/5",
                 isDragging && "opacity-50",
             )}
