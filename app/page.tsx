@@ -75,23 +75,42 @@ export default function Home() {
     }
 
     const context = gsap.context(() => {
-      gsap.from(".landing-hero-item", {
-        y: 28,
-        autoAlpha: 0,
-        duration: 0.85,
-        stagger: 0.1,
+      gsap.defaults({
         ease: "power3.out",
+        overwrite: "auto",
       });
 
-      gsap.utils.toArray<HTMLElement>(".landing-reveal").forEach((element) => {
-        gsap.from(element, {
-          y: 32,
+      gsap.fromTo(
+        ".landing-hero-item",
+        {
+          y: 26,
+          scale: 0.985,
           autoAlpha: 0,
-          duration: 0.75,
-          ease: "power2.out",
+        },
+        {
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: 1.25,
+          stagger: 0.22,
+          clearProps: "transform,opacity,visibility",
+        }
+      );
+
+      gsap.utils.toArray<HTMLElement>(".landing-reveal").forEach((element) => {
+        gsap.fromTo(element, {
+          y: 24,
+          scale: 0.99,
+          autoAlpha: 0,
+        }, {
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: 1.1,
+          clearProps: "transform,opacity,visibility",
           scrollTrigger: {
             trigger: element,
-            start: "top 86%",
+            start: "top 88%",
             once: true,
           },
         });
@@ -178,16 +197,16 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2.5 text-base font-semibold tracking-tight">
+            <Link href="/" className="flex items-center gap-3 text-lg font-semibold sm:text-xl">
               <img
                 src="https://cdn-icons-png.flaticon.com/512/11213/11213073.png"
                 alt="Formora logo"
-                className="size-7 rounded-md object-cover"
+                className="size-8 rounded-md object-cover"
               />
-              <span className="font-medium text-foreground tracking-tight">formora</span>
+              <span className="font-mono text-base font-semibold uppercase tracking-[0.14em] leading-none text-foreground sm:text-lg">FORMORA</span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-muted-foreground">
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
               <a href="#workbench" className="hover:text-foreground transition-colors">
                 Workbench
               </a>
@@ -216,19 +235,17 @@ export default function Home() {
       <section className="landing-reveal relative mx-auto max-w-7xl px-5 pt-14 pb-10 sm:px-6 lg:px-10 lg:pt-24 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div className="landing-hero-item">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 px-3 py-1 text-[11px] font-mono text-muted-foreground">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 px-3 py-1 text-xs font-mono text-muted-foreground">
               <span className="size-1.5 rounded-full bg-primary" />
               <span>FORM BUILDER & COMPILER</span>
-              <span className="text-border">/</span>
-              <span className="text-foreground">NEXT.JS 16</span>
             </div>
 
-            <h1 className="text-4xl font-medium tracking-[-0.045em] sm:text-6xl lg:text-7xl leading-[1.04] text-foreground">
+            <h1 className="text-4xl font-semibold tracking-[-0.015em] sm:text-6xl lg:text-7xl leading-[1.08] text-foreground">
               Build forms people <br />
               <span className="text-muted-foreground">actually finish.</span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground font-normal sm:text-lg sm:leading-8">
               A tactile workspace designed for speed and clarity. Arrange fields,
               inspect the live schema, and deploy native forms that feel effortless to answer.
             </p>
@@ -290,9 +307,9 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 bg-muted/30 px-5 py-3.5">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
-                <div className="size-2.5 rounded-full bg-border" />
-                <div className="size-2.5 rounded-full bg-border" />
-                <div className="size-2.5 rounded-full bg-border" />
+                <div className="size-2.5 rounded-full bg-red-500" />
+                <div className="size-2.5 rounded-full bg-yellow-400" />
+                <div className="size-2.5 rounded-full bg-green-500" />
               </div>
               <span className="font-mono text-xs text-muted-foreground">
                 workspace / feedback_survey.form
@@ -740,12 +757,30 @@ export default function Home() {
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-2">
               Design Philosophy
             </p>
-            <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-foreground">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-foreground">
               Form infrastructure without the clutter.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               Every design choice in Formora prioritizes submission completion over flashy gimmicks.
             </p>
+          </div>
+
+          <div className="mb-16 grid max-w-3xl grid-cols-3 gap-3" aria-label="Form builder design principles">
+            {[
+              { icon: SlidersHorizontal, label: "Arrange" },
+              { icon: Code2, label: "Compose" },
+              { icon: Database, label: "Persist" },
+            ].map(({ icon: Icon, label }, index) => (
+              <div
+                key={label}
+                className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/50 p-3 text-xs font-mono text-muted-foreground"
+              >
+                <span className="flex size-8 items-center justify-center rounded-md border border-primary/40 bg-primary/10 text-primary">
+                  <Icon className="size-4" />
+                </span>
+                <span>{String(index + 1).padStart(2, "0")} / {label}</span>
+              </div>
+            ))}
           </div>
 
           <div className="grid gap-10 md:grid-cols-3">
@@ -790,7 +825,7 @@ export default function Home() {
               <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-2">
                 Built For Craft
               </p>
-              <h2 className="text-3xl font-medium tracking-tight text-foreground">
+              <h2 className="text-3xl font-semibold tracking-[-0.02em] text-foreground">
                 Engineered for teams who care about the details.
               </h2>
               <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
@@ -816,8 +851,18 @@ export default function Home() {
 
             {/* Code / Architecture Card */}
             <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-xl">
+              <div className="mb-5 grid grid-cols-3 gap-2" aria-label="Form specification flow">
+                {[ShieldCheck, Database, Zap].map((Icon, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-center rounded-md border border-primary/30 bg-primary/5 py-3 text-primary"
+                  >
+                    <Icon className="size-5" />
+                  </div>
+                ))}
+              </div>
               <div className="flex items-center justify-between border-b border-border/60 pb-3 text-xs font-mono text-muted-foreground">
-                <span>formly.config.ts</span>
+                <span>formora.config.ts</span>
                 <span>TypeScript</span>
               </div>
               <pre className="mt-4 font-mono text-xs leading-relaxed text-muted-foreground overflow-x-auto">
@@ -844,7 +889,7 @@ export default function Home() {
       <section className="landing-reveal border-t border-border/50 bg-muted/20 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-xl font-medium tracking-tight text-foreground">
+            <h3 className="text-xl font-semibold tracking-[-0.01em] text-foreground">
               Ready to assemble your first form?
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -869,9 +914,9 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="flex size-5 items-center justify-center rounded bg-primary text-[10px] font-semibold text-primary-foreground">
-              f
+              F
             </span>
-                <span className="font-medium text-foreground">formora</span>
+            <span className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-foreground">FORMORA</span>
             <span className="text-border">·</span>
             <span>Quiet, focused form builder for modern teams</span>
           </div>
@@ -884,7 +929,7 @@ export default function Home() {
               Sign In
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/your-username/formora"
               target="_blank"
               rel="noreferrer"
               className="hover:text-foreground transition-colors"
