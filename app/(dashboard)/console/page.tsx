@@ -15,7 +15,7 @@ export default async function ConsolePage() {
 
   return (
     <main className="min-h-screen">
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
         <div className="flex flex-col gap-3 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
