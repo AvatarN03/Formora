@@ -29,12 +29,14 @@ export default function DesignerSidebarElement({
             type="button"
             variant="outline"
             className={cn(
-                "h-auto min-h-16 rounded-sm flex-col gap-2 border-border/60 px-3 py-3 text-xs",
-                "hover:border-primary/60 hover:bg-primary/5",
+                "h-auto min-h-20 rounded-none flex-col items-start gap-3 border-[var(--builder-line)] bg-transparent px-3 py-3 text-left text-[11px] font-bold uppercase tracking-[0.04em] text-[var(--builder-ink)]",
+                "touch-none hover:border-[var(--builder-signal)] hover:bg-[var(--builder-signal)]/5",
                 isDragging && "opacity-50",
             )}
+            aria-roledescription="draggable form element"
+            aria-describedby="designer-drag-instructions"
         >
-            <Icon className="size-5 text-muted-foreground" />
+            <Icon className="size-5 text-[var(--builder-signal)]" />
             <span>{label}</span>
         </Button>
     );

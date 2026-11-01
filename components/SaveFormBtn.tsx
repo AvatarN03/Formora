@@ -22,7 +22,7 @@ export default function SaveFormBtn({ formId, elements }: { formId: string; elem
   };
 
   return (
-    <Button type="button" variant="outline" size="sm" onClick={save} disabled={isSaving}>
+    <Button type="button" variant="outline" size="sm" className="builder-action" onClick={save} disabled={isSaving}>
       {isSaving ? "Saving..." : "Save"}
     </Button>
   );

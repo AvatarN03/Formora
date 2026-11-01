@@ -14,29 +14,42 @@ export default async function ConsolePage() {
   }
 
   return (
-    <main className="console-page min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
-        <div className="flex flex-col gap-3 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <main data-console className="console-page min-h-screen">
+      <div className="mx-auto max-w-[96rem] space-y-10 px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
+        <div className="flex flex-col gap-6 border-b border-border/50 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              <span>Workspace Console</span>
+            <div className="mb-5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="h-0.5 w-10 bg-primary" />
+              <span>Workspace / Console</span>
             </div>
-            <h1 className="mt-1 text-2xl font-medium tracking-tight text-foreground">
-              Form workspace
+            <h1 className="max-w-[9ch] text-5xl font-bold uppercase leading-[0.9] tracking-[-0.06em] text-foreground sm:text-7xl">
+              Your forms, in focus.
             </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              Overview of active forms, response collection, and deployment status.
+            <p className="mt-5 max-w-lg text-sm leading-6 text-muted-foreground sm:text-base">
+              A focused workspace for composing clear forms, collecting responses, and keeping every project moving.
             </p>
           </div>
 
-          <CreateForm />
+          <div className="flex shrink-0 items-center gap-3">
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
+              {new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+            </span>
+            <CreateForm />
+          </div>
         </div>
 
+        <div className="console-section-label">
+          <span>01</span>
+          <span>Workspace overview</span>
+        </div>
         <Suspense fallback={<StatsCardsSkeleton />}>
           <StatsCards userId={userId} />
         </Suspense>
 
+        <div className="console-section-label pt-2">
+          <span>02</span>
+          <span>Form collection</span>
+        </div>
         <Suspense fallback={<FormCollectionSkeleton />}>
           <FormCollection userId={userId} />
         </Suspense>

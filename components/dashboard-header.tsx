@@ -1,7 +1,10 @@
 import Link from "next/link";
 
 import { UserButton } from "@clerk/nextjs";
-import { Layers } from "lucide-react";
+import { ArrowUpRight, Layers } from "lucide-react";
+
+import { ThemeLogo } from "@/components/theme-logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface DashboardHeaderProps {
   name: string;
@@ -10,35 +13,33 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ name, email }: DashboardHeaderProps) {
   return (
-    <header className="console-header sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+    <header className="console-header sticky top-0 z-40 border-b">
+      <div className="mx-auto flex min-h-16 max-w-[96rem] items-center justify-between px-5 py-3 sm:px-6 lg:px-10">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/11213/11213073.png"
-              alt="Formora logo"
-              className="size-7 rounded-md object-cover"
-            />
-            <span className="text-base font-semibold tracking-tight text-foreground">formora</span>
+          <Link href="/" className="flex items-center gap-3">
+            <ThemeLogo />
+            <span className="font-mono text-sm font-semibold tracking-[0.16em]">FORMORA</span>
           </Link>
 
-          <span className="text-border/80">/</span>
+          <span className="text-muted-foreground/50">/</span>
 
-          <div className="flex items-center gap-1.5 rounded border border-border/60 bg-muted/30 px-2 py-0.5 text-sm text-muted-foreground">
+          <div className="hidden items-center gap-2 text-[10px] font-mono uppercase tracking-[0.14em] text-muted-foreground sm:flex">
             <Layers className="size-3 text-primary" />
-            <span className="max-w-30 truncate font-medium text-foreground sm:max-w-none">
-              {name}&apos;s workspace
-            </span>
-            <span className="rounded bg-primary/15 px-1 py-0.2 text-[9px] font-mono uppercase text-primary">
-              Free
-            </span>
+            <span>Workspace</span>
+            <span className="text-muted-foreground/50">/</span>
+            <span className="text-foreground">{name}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
+          <Link href="/" className="hidden items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-primary md:flex">
+            View site
+            <ArrowUpRight className="size-3" />
+          </Link>
+          <ThemeToggle />
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium leading-tight text-foreground">{name}</p>
-            <p className="mt-0.5 break-words text-xs text-muted-foreground">{email}</p>
+            <p className="text-xs font-medium leading-tight text-foreground">{name}</p>
+            <p className="mt-0.5 break-words text-[10px] text-muted-foreground">{email}</p>
           </div>
           <UserButton appearance={{ elements: { avatarBox: "size-8 border border-border/80" } }} />
         </div>

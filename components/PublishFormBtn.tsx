@@ -33,7 +33,7 @@ export default function PublishFormBtn({
   };
 
   return (
-    <Button type="button" size="sm" onClick={publish} disabled={isPublishing}>
+    <Button type="button" size="sm" className="builder-action-primary" onClick={publish} disabled={isPublishing}>
       {isPublishing ? "Publishing..." : "Publish"}
     </Button>
   );

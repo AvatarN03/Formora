@@ -3,7 +3,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -52,28 +51,37 @@ export default function CreateForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="rounded-sm text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4 py-2.5">
+      <DialogTrigger className="rounded-sm bg-primary px-4 py-2.5 text-sm uppercase tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/90">
         New form
       </DialogTrigger>
 
-      <DialogContent className="rounded-sm sm:max-w-106.25">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Create a new form</DialogTitle>
-          <DialogDescription className="text-base">
-            Start with a clear name and a short description. You can refine the fields in the builder.
-          </DialogDescription>
+      <DialogContent className="create-form-dialog rounded-sm border sm:max-w-lg">
+        <DialogHeader className="border-b pb-5">
+          <div className="mb-3 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            <span className="h-0.5 w-8 bg-primary" />
+            <span>New work / 01</span>
+          </div>
+          <DialogTitle className="text-3xl font-bold uppercase leading-none tracking-[-0.05em]">
+            Create a new form
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">Form name</FormLabel>
+                  <FormLabel className="font-mono text-[10px] uppercase tracking-[0.14em]">
+                    Form name
+                  </FormLabel>
                   <FormControl>
-                    <Input className="rounded-sm text-base" placeholder="Customer feedback" {...field} />
+                    <Input
+                      className="h-11 rounded-sm bg-background text-base"
+                      placeholder="Customer feedback"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,21 +92,27 @@ export default function CreateForm() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">What is this form for?</FormLabel>
-                  <FormControl>
-                    <Textarea className="rounded-sm text-base" placeholder="Collect feedback from your customers" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                    <FormLabel className="font-mono text-[10px] uppercase tracking-[0.14em]">
+                      What is this form for?
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="min-h-28 resize-none rounded-sm bg-background text-base"
+                        placeholder="Collect feedback from your customers"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
               )}
-            />
+              />
 
-            <DialogFooter>
-              <Button
-                type="submit"
-                className="w-full rounded-sm text-base"
-                disabled={form.formState.isSubmitting}
-              >
+              <DialogFooter className="border-t pt-5">
+                <Button
+                  type="submit"
+                  className="w-full rounded-sm text-sm uppercase tracking-[0.08em]"
+                  disabled={form.formState.isSubmitting}
+                >
                 {form.formState.isSubmitting ? (
                   <>
                     <Save className="mr-2 h-4 w-4 animate-pulse" />

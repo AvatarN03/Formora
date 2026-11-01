@@ -23,15 +23,16 @@ const DesignerSidebar = ({
   if (selectedElement) {
     const PropertiesComponent = selectedElement.propertiesComponent;
 
-    return (
-      <aside className="flex min-h-[600px] h-full w-full max-w-94 grow flex-col gap-4 overflow-y-auto border-l-2 border-muted bg-background p-4 lg:min-h-[800px]">
-        <Button type="button" variant="ghost" className="w-fit gap-2 px-2" onClick={onBack}>
+      return (
+      <aside className="builder-rail flex min-h-[600px] h-full w-full max-w-[360px] shrink-0 flex-col gap-5 overflow-y-auto border border-[var(--builder-line)] bg-[var(--builder-paper)] p-5 lg:min-h-[800px]">
+      <Button type="button" variant="ghost" className="builder-muted w-fit gap-2 px-0 text-[10px] font-bold uppercase tracking-[0.14em] hover:bg-transparent hover:text-[var(--builder-signal)]" onClick={onBack}>
           <ArrowLeft className="size-4" />
           Back to elements
         </Button>
         <div>
-          <h3 className="text-sm font-medium text-foreground">{selectedElement.designerBtn.label}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Edit element properties</p>
+          <p className="builder-signal text-[10px] font-bold uppercase tracking-[0.18em]">Properties</p>
+          <h3 className="builder-ink mt-2 text-xl font-bold tracking-[-0.04em]">{selectedElement.designerBtn.label}</h3>
+          <p className="builder-muted mt-1 text-xs">Edit field properties</p>
         </div>
         {selectedInstance ? (
           <PropertiesComponent element={selectedInstance} updateElement={onUpdateElement} />
@@ -49,14 +50,18 @@ const DesignerSidebar = ({
   );
 
   return (
-    <aside className="flex min-h-[600px] h-full w-full max-w-94 grow flex-col gap-3 overflow-y-auto border-l-2 border-muted bg-background p-4 lg:min-h-[800px]">
-      <h3 className="text-sm font-medium text-foreground">Elements</h3>
+    <aside className="builder-rail flex min-h-[600px] h-full w-full max-w-[360px] shrink-0 flex-col gap-5 overflow-y-auto border border-[var(--builder-line)] bg-[var(--builder-paper)] p-5 lg:min-h-[800px]">
+      <div>
+        <p className="builder-signal text-[10px] font-bold uppercase tracking-[0.18em]">Library / 02</p>
+        <h3 className="builder-ink mt-2 text-2xl font-bold tracking-[-0.05em]">Elements</h3>
+        <p className="builder-muted mt-1 text-xs">Drag a field onto the canvas.</p>
+      </div>
       <section className="space-y-2">
-        <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Layout</h4>
+        <h4 className="builder-muted text-[10px] font-bold uppercase tracking-[0.18em]">01 / Layout</h4>
         {renderElements(layoutElements)}
       </section>
       <section className="space-y-2">
-        <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Form elements</h4>
+        <h4 className="builder-muted text-[10px] font-bold uppercase tracking-[0.18em]">02 / Form fields</h4>
         {renderElements(formElements)}
       </section>
     </aside>
