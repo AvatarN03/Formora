@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { buttonVariants } from "@/components/ui/button";
+import { ThemeLogo } from "@/components/theme-logo";
 import {
   ChevronUp,
   ChevronDown,
@@ -198,11 +199,9 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-3 text-lg font-semibold sm:text-xl">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/11213/11213073.png"
-                alt="Formora logo"
-                className="size-8 rounded-md object-cover"
-              />
+              <span className="relative flex size-8 items-center justify-center">
+                <ThemeLogo />
+              </span>
               <span className="font-mono text-base font-semibold uppercase tracking-[0.14em] leading-none text-foreground sm:text-lg">FORMORA</span>
             </Link>
 
@@ -237,7 +236,7 @@ export default function Home() {
           <div className="landing-hero-item">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 px-3 py-1 text-xs font-mono text-muted-foreground">
               <span className="size-1.5 rounded-full bg-primary" />
-              <span>FORM BUILDER & COMPILER</span>
+              <span>FORM CREATION, WITHOUT THE FRICTION</span>
             </div>
 
             <h1 className="text-4xl font-semibold tracking-[-0.015em] sm:text-6xl lg:text-7xl leading-[1.08] text-foreground">
@@ -246,8 +245,8 @@ export default function Home() {
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground font-normal sm:text-lg sm:leading-8">
-              A tactile workspace designed for speed and clarity. Arrange fields,
-              inspect the live schema, and deploy native forms that feel effortless to answer.
+              A clear, tactile workspace for creating forms people actually want to complete.
+              Arrange questions, preview every detail, and share when it feels right.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -268,32 +267,32 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick Technical Specs Table */}
+          {/* Quick product overview */}
           <div className="landing-hero-item rounded-lg border border-border/60 bg-card/40 p-5 backdrop-blur-sm sm:p-6">
             <div className="flex items-center justify-between border-b border-border/60 pb-3 text-xs font-mono text-muted-foreground">
-              <span>SYSTEM SPECIFICATION</span>
+              <span>THE FORMULA</span>
               <span className="text-emerald-500 flex items-center gap-1.5">
                 <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                READY
+                READY TO BUILD
               </span>
             </div>
 
             <div className="mt-4 divide-y divide-border/40 text-xs font-mono">
               <div className="flex justify-between py-2.5">
-                <span className="text-muted-foreground">Runtime Rendering</span>
-                <span className="text-foreground">Zero-iframe Native React 19</span>
+                <span className="text-muted-foreground">01 / Arrange</span>
+                <span className="text-foreground">Drag and drop fields</span>
               </div>
               <div className="flex justify-between py-2.5">
-                <span className="text-muted-foreground">Data Layer</span>
-                <span className="text-foreground">PostgreSQL & Prisma ORM</span>
+                <span className="text-muted-foreground">02 / Refine</span>
+                <span className="text-foreground">Edit in a live preview</span>
               </div>
               <div className="flex justify-between py-2.5">
-                <span className="text-muted-foreground">Authentication</span>
-                <span className="text-foreground">Clerk Session Guards</span>
+                <span className="text-muted-foreground">03 / Share</span>
+                <span className="text-foreground">Publish when ready</span>
               </div>
               <div className="flex justify-between py-2.5">
-                <span className="text-muted-foreground">Component Primitive</span>
-                <span className="text-foreground">shadcn/ui maia-olive</span>
+                <span className="text-muted-foreground">Always</span>
+                <span className="text-foreground">Simple for respondents</span>
               </div>
             </div>
           </div>
