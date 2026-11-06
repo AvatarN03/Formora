@@ -1,5 +1,16 @@
-import { AuthPage } from "@/components/auth-page";
+"use client";
+
+import { SignIn } from "@clerk/nextjs";
+import { useAuthAppearance } from "@/lib/auth-appearance";
 
 export default function SignInPage() {
-  return <AuthPage mode="sign-in" />;
+  const appearance = useAuthAppearance();
+
+  return (
+    <SignIn
+      fallbackRedirectUrl="/console"
+      forceRedirectUrl="/console"
+      appearance={appearance}
+    />
+  );
 }

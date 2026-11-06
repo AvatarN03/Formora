@@ -8,19 +8,19 @@ export function HeroInteractiveCanvas() {
       {/* 2-Element Drag & Drop Stage (Borderless, Rounded, Minimalist) */}
       <div className="relative w-full h-[190px]">
         {/* Item A (Initially Top) */}
-        <div className="hero-drag-item-a absolute inset-x-0 top-0 rounded-2xl bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+        <div className="hero-drag-item-a absolute inset-x-0 top-0 rounded-2xl bg-card p-4 shadow-sm transition-shadow hover:shadow-md border border-border/40">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <GripVertical className="size-4 text-muted-foreground/30" />
-              <span className="text-sm font-medium text-foreground">
+              <GripVertical className="size-4 text-muted-foreground/50" />
+              <span className="text-sm font-semibold text-foreground">
                 Workplace name
               </span>
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">
+            <span className="text-[11px] font-mono font-medium text-muted-foreground">
               Text
             </span>
           </div>
-          <div className="mt-2.5 h-8 w-full rounded-lg bg-muted/30 px-3 text-xs text-muted-foreground/70 flex items-center">
+          <div className="mt-2.5 h-8 w-full rounded-lg bg-secondary/70 border border-border/50 px-3 text-xs font-normal text-foreground/80 flex items-center">
             e.g. Acme Design Labs
           </div>
         </div>
@@ -33,7 +33,7 @@ export function HeroInteractiveCanvas() {
         </div>
 
         {/* Item B (Initially Bottom, Smoothly Dragged to Top) */}
-        <div className="hero-drag-item-b absolute inset-x-0 top-[94px] rounded-2xl bg-card p-4 shadow-sm transition-shadow">
+        <div className="hero-drag-item-b absolute inset-x-0 top-[94px] rounded-2xl bg-card p-4 shadow-sm transition-shadow border border-border/40">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative flex items-center justify-center">
@@ -45,15 +45,15 @@ export function HeroInteractiveCanvas() {
                 </div>
               </div>
 
-              <span className="text-sm font-medium text-foreground">
+              <span className="text-sm font-semibold text-foreground">
                 Contact email
               </span>
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">
+            <span className="text-[11px] font-mono font-medium text-muted-foreground">
               Email
             </span>
           </div>
-          <div className="mt-2.5 h-8 w-full rounded-lg bg-muted/30 px-3 text-xs text-muted-foreground/70 flex items-center">
+          <div className="mt-2.5 h-8 w-full rounded-lg bg-secondary/70 border border-border/50 px-3 text-xs font-normal text-foreground/80 flex items-center">
             alex@acme.ch
           </div>
         </div>

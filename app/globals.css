@@ -433,178 +433,60 @@ button:disabled {
 }
 
 .auth-scene {
-  --auth-background: #f5f1e8;
-  --auth-foreground: #171717;
-  --auth-card: #fffdf8;
-  --auth-border: rgba(23, 23, 23, 0.26);
-  --auth-muted: #625e57;
+  --background: #f7f4ed;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
   --primary: #e33b2f;
-  --primary-foreground: #fffdf8;
-  --muted-foreground: #625e57;
-  background: var(--auth-background);
-  color: var(--auth-foreground);
-}
-
-.auth-scene::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  content: "";
-  background: linear-gradient(to bottom, rgba(23, 23, 23, 0.035) 1px, transparent 1px);
-  background-size: 100% 6rem;
+  --primary-foreground: #ffffff;
+  --secondary: #eee9e0;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0ebe2;
+  --muted-foreground: #4a453e;
+  --accent: #e33b2f;
+  --accent-foreground: #ffffff;
+  --border: #e2dcd2;
+  --input: #d1cbc0;
+  --ring: #e33b2f;
+  color-scheme: light;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .dark .auth-scene {
-  --auth-background: #111318;
-  --auth-foreground: #f4f1e8;
-  --auth-card: #1a1d23;
-  --auth-border: rgba(244, 241, 232, 0.28);
-  --auth-muted: #b7b2aa;
+  --background: #111317;
+  --foreground: #f2efe9;
+  --card: #181b22;
+  --card-foreground: #f2efe9;
+  --popover: #181b22;
+  --popover-foreground: #f2efe9;
   --primary: #ff6b52;
-  --primary-foreground: #171717;
-  --muted-foreground: #b7b2aa;
-}
-
-.dark .auth-scene::before {
-  background: linear-gradient(to bottom, rgba(244, 241, 232, 0.04) 1px, transparent 1px);
-  background-size: 100% 6rem;
-}
-
-.auth-rule {
-  position: absolute;
-  inset-block: 0;
-  left: clamp(1.5rem, 8.333vw, 8rem);
-  width: 1px;
-  background: color-mix(in srgb, var(--primary) 60%, transparent);
-  pointer-events: none;
+  --primary-foreground: #111317;
+  --secondary: #222630;
+  --secondary-foreground: #f2efe9;
+  --muted: #1e222a;
+  --muted-foreground: #a6a096;
+  --accent: #ff6b52;
+  --accent-foreground: #111317;
+  --border: #262a34;
+  --input: #3b404d;
+  --ring: #ff6b52;
+  color-scheme: dark;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .auth-header {
-  border-color: var(--auth-border);
-  background: color-mix(in srgb, var(--auth-background) 90%, transparent);
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(14px);
 }
 
-.auth-home-link {
-  color: var(--auth-muted);
-  transition: color 180ms ease;
-}
-
-.auth-home-link:hover,
-.auth-clerk-link:hover {
-  color: var(--primary);
-}
-
 .auth-card-wrap {
-  border: 1px solid var(--auth-border);
-  background: var(--auth-card);
-  border-radius: 1rem;
-  padding: 1.25rem;
-}
-
-.auth-drag-preview {
-  border-color: var(--auth-border);
-  background: color-mix(in srgb, var(--auth-card) 62%, transparent);
-}
-
-.auth-drag-preview > .border-b {
-  border-color: var(--auth-border);
-}
-
-.auth-drag-item {
-  border-color: var(--auth-border);
-  background: color-mix(in srgb, var(--auth-card) 78%, transparent);
-  will-change: transform, opacity, box-shadow;
-}
-
-.auth-drag-item-source {
-  animation: auth-drag-source 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
-.auth-drag-item-target {
-  transform: translateX(1.5rem);
-  animation: auth-drag-target 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
-.auth-drag-cursor {
-  filter: drop-shadow(4px 4px 0 color-mix(in srgb, var(--foreground) 18%, transparent));
-  transform-origin: 0 0;
-  animation: auth-cursor-drag 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
-@keyframes auth-drag-source {
-  0%,
-  8%,
-  72%,
-  100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-    box-shadow: none;
-  }
-  18%,
-  52% {
-    transform: translate(0, 0) scale(1.03);
-    opacity: 0.82;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent),
-      0 8px 14px color-mix(in srgb, var(--foreground) 12%, transparent);
-  }
-  60%,
-  68% {
-    transform: translate(0, 3.75rem) scale(1.03);
-    opacity: 0.92;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 50%, transparent),
-      0 8px 14px color-mix(in srgb, var(--foreground) 12%, transparent);
-  }
-}
-
-@keyframes auth-drag-target {
-  0%,
-  8%,
-  72%,
-  100% {
-    transform: translateX(1.5rem);
-  }
-  52%,
-  68% {
-    transform: translate(-1.5rem, -3.75rem);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 38%, transparent);
-  }
-}
-
-@keyframes auth-cursor-drag {
-  0%,
-  8%,
-  72%,
-  100% {
-    transform: translate(0, 0) rotate(-18deg);
-  }
-  18% {
-    transform: translate(-11rem, -6.5rem) scale(0.9) rotate(-18deg);
-  }
-  24%,
-  48% {
-    transform: translate(-11rem, -6.5rem) scale(0.82) rotate(-18deg);
-  }
-  60%,
-  68% {
-    transform: translate(-10rem, -2.75rem) scale(0.82) rotate(-18deg);
-  }
-  69% {
-    transform: translate(-10rem, -2.75rem) scale(1) rotate(-18deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-drag-item-source,
-  .auth-drag-item-target,
-  .auth-drag-cursor {
-    animation: none;
-  }
-}
-
-.auth-card-wrap > .border-b {
-  border-color: var(--auth-border);
+  border: 1px solid var(--border);
+  background: var(--card);
 }
 
 .auth-clerk-card {
@@ -612,13 +494,11 @@ button:disabled {
   background: transparent;
   border: 0 !important;
   box-shadow: none !important;
-  border-radius: 0.25rem !important;
 }
 
 .auth-clerk-card-box {
   border: 0 !important;
   box-shadow: none !important;
-  border-radius: 0.25rem !important;
 }
 
 .auth-clerk-root {
@@ -626,26 +506,27 @@ button:disabled {
   background: transparent;
   border: 0 !important;
   box-shadow: none !important;
-  border-radius: 0.25rem !important;
 }
 
 .auth-clerk-title,
 .auth-clerk-label {
-  color: var(--auth-foreground);
+  color: var(--foreground);
 }
 
 .auth-clerk-subtitle {
-  color: var(--auth-muted);
+  color: var(--muted-foreground);
 }
 
 .auth-clerk-input {
-  border-color: var(--auth-border);
-  color: var(--auth-foreground);
+  border-color: var(--border);
+  color: var(--foreground);
+  background-color: var(--secondary);
 }
 
 .auth-clerk-input:focus {
   border-color: var(--primary);
-  box-shadow: 3px 3px 0 var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
 
 .auth-clerk-primary {
@@ -667,7 +548,6 @@ button:disabled {
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
 }
 
 body {
@@ -683,25 +563,25 @@ body {
 }
 
 :root {
-  --background: #090a10;
-  --foreground: #f3f4f6;
-  --card: #121422;
-  --card-foreground: #f3f4f6;
-  --popover: #121422;
-  --popover-foreground: #f3f4f6;
-  --primary: #f97316;
+  --background: #f7f4ed;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #e33b2f;
   --primary-foreground: #ffffff;
-  --secondary: #1a1c2e;
-  --secondary-foreground: #e5e7eb;
-  --muted: #161826;
-  --muted-foreground: #9ca3af;
-  --accent: #8b5cf6;
+  --secondary: #eee9e0;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0ebe2;
+  --muted-foreground: #4a453e;
+  --accent: #e33b2f;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #23263b;
-  --input: #23263b;
-  --ring: #f97316;
+  --border: #e2dcd2;
+  --input: #d1cbc0;
+  --ring: #e33b2f;
   --radius: 0.65rem;
 
   /* Chat Scene Custom Colors */
@@ -713,6 +593,28 @@ body {
   --chat-accent-purple: #8b5cf6;
   --chat-accent-cyan: #06b6d4;
   --chat-accent-emerald: #10b981;
+}
+
+.dark {
+  --background: #111317;
+  --foreground: #f2efe9;
+  --card: #181b22;
+  --card-foreground: #f2efe9;
+  --popover: #181b22;
+  --popover-foreground: #f2efe9;
+  --primary: #ff6b52;
+  --primary-foreground: #111317;
+  --secondary: #222630;
+  --secondary-foreground: #f2efe9;
+  --muted: #1e222a;
+  --muted-foreground: #a6a096;
+  --accent: #ff6b52;
+  --accent-foreground: #111317;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #262a34;
+  --input: #3b404d;
+  --ring: #ff6b52;
 }
 
 @theme inline {
