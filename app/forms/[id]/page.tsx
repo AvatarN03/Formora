@@ -276,7 +276,7 @@ export default async function FormResponsesPage({
                     </div>
 
                     {isChoice && insight.distribution.length > 0 ? (
-                      <div className="mt-5 space-y-3">
+                      <div className="mt-5 h-[188px] space-y-3 overflow-y-auto pr-1">
                         {insight.distribution.slice(0, 5).map((item) => (
                           <div key={item.label}>
                             <div className="mb-1 flex items-center justify-between gap-2 text-xs">

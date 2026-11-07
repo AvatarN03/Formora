@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createHash, createHmac, randomBytes } from "node:crypto";
+import { isIP } from "node:net";
 import { Prisma } from "@prisma/client";
 
 import prisma from "@/lib/prisma";
@@ -563,9 +564,7 @@ function hashSubmissionKey(submissionKey: string) {
 }
 
 function getClientIpHash(requestHeaders: Headers) {
-  const forwardedFor = requestHeaders.get("x-forwarded-for");
-  const forwardedIp = forwardedFor?.split(",")[0]?.trim();
-  const ip = forwardedIp || requestHeaders.get("x-real-ip")?.trim();
+  const ip = getClientIp(requestHeaders);
   if (!ip) return null;
 
   return createHmac("sha256", getBrowserTokenSecret())
@@ -573,15 +572,64 @@ function getClientIpHash(requestHeaders: Headers) {
     .digest("hex");
 }
 
-function getClientLocationLabel(requestHeaders: Headers) {
+function getClientIp(requestHeaders: Headers) {
+  const forwardedFor = requestHeaders.get("x-forwarded-for");
+  const forwardedIp = forwardedFor?.split(",")[0]?.trim();
+  return forwardedIp || requestHeaders.get("x-real-ip")?.trim() || null;
+}
+
+function isPublicIp(ip: string) {
+  const normalized = ip.trim().replace(/^\[|\]$/g, "").toLowerCase();
+  if (!isIP(normalized)) return false;
+
+  if (normalized.startsWith("::ffff:") && normalized.includes(".")) {
+    return isPublicIp(normalized.slice("::ffff:".length));
+  }
+
+  if (normalized.includes(".")) {
+    const octets = normalized.split(".").map(Number);
+    const [first, second] = octets;
+    return !(
+      first === 0 ||
+      first === 10 ||
+      first === 127 ||
+      (first === 169 && second === 254) ||
+      (first === 172 && second >= 16 && second <= 31) ||
+      (first === 192 && second === 168)
+    );
+  }
+
+  return !(
+    normalized === "::1" ||
+    normalized === "::" ||
+    normalized.startsWith("fc") ||
+    normalized.startsWith("fd") ||
+    normalized.startsWith("fe8") ||
+    normalized.startsWith("fe9") ||
+    normalized.startsWith("fea") ||
+    normalized.startsWith("feb")
+  );
+}
+
+function cleanLocationPart(value: unknown) {
+  if (typeof value !== "string") return null;
+
+  return value
+    .trim()
+    .replace(/[\r\n,]+/g, " ")
+    .replace(/\s+/g, " ")
+    .slice(0, 80) || null;
+}
+
+async function getClientLocationLabel(requestHeaders: Headers) {
   const readHeader = (...names: string[]) => {
     for (const name of names) {
       const value = requestHeaders.get(name)?.trim();
       if (value) {
         try {
-          return decodeURIComponent(value).replace(/[\r\n,]+/g, " ").slice(0, 80);
+          return cleanLocationPart(decodeURIComponent(value));
         } catch {
-          return value.replace(/[\r\n,]+/g, " ").slice(0, 80);
+          return cleanLocationPart(value);
         }
       }
     }
@@ -591,7 +639,31 @@ function getClientLocationLabel(requestHeaders: Headers) {
   const city = readHeader("x-vercel-ip-city", "cf-ipcity", "x-geo-city", "x-city");
   const region = readHeader("x-vercel-ip-country-region", "x-geo-region");
   const country = readHeader("x-vercel-ip-country", "cf-ipcountry", "x-country-code");
-  return [city, region, country].filter(Boolean).join(", ") || null;
+  const providerLabel = [city, region, country].filter(Boolean).join(", ");
+  if (providerLabel) return providerLabel;
+
+  const ip = getClientIp(requestHeaders);
+  if (!ip) return process.env.NODE_ENV === "development" ? "Local/private network" : null;
+  if (!isPublicIp(ip)) return "Local/private network";
+
+  try {
+    const response = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      city?: unknown;
+      region?: unknown;
+      country_name?: unknown;
+    };
+    return [cleanLocationPart(data.city), cleanLocationPart(data.region), cleanLocationPart(data.country_name)]
+      .filter(Boolean)
+      .join(", ") || null;
+  } catch {
+    return null;
+  }
 }
 
 async function hasSubmissionLocationColumn() {
@@ -716,7 +788,7 @@ export const submitForm = async (
   const submissionKeyHash = hashSubmissionKey(submissionKey);
   const requestHeaders = await headers();
   const ipHash = getClientIpHash(requestHeaders);
-  const locationLabel = getClientLocationLabel(requestHeaders);
+  const locationLabel = await getClientLocationLabel(requestHeaders);
   const hasLocationColumn = await hasSubmissionLocationColumn();
 
   const existingSubmission = await prisma.$queryRaw<Array<{ id: number }>>`
