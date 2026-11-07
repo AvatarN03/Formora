@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, Download, FileSpreadsheet, Inbox, Pencil } from "lucide-react";
+import { ArrowLeft, Download, Inbox, Pencil } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 
 import { getFormResponses } from "@/actions/form";
@@ -159,48 +159,34 @@ export default async function FormResponsesPage({
       <div className="mx-auto max-w-[96rem] px-5 py-8 sm:px-6 lg:px-10 lg:py-12">
         <div className="border-b border-border/50 pb-8">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            <Link
+              href="/console"
+              aria-label="Back to console"
+              title="Back to console"
+              className="inline-flex size-6 items-center justify-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <ArrowLeft className="size-3.5" />
+            </Link>
             <Link href="/console" className="transition-colors hover:text-foreground">Workspace</Link>
             <span className="text-border">/</span>
             <span>Responses</span>
           </div>
 
-          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-                <Inbox className="size-5" strokeWidth={1.8} />
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                <Inbox className="size-4" strokeWidth={1.8} />
               </div>
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-primary">Form response desk</p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{form.name}</h1>
-              </div>
+              <h1 className="truncate text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">{form.name}</h1>
             </div>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Review every response in one focused workspace, then export the complete dataset when you need it.
-            </p>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/console"
-              className={buttonVariants({ variant: "ghost", size: "sm", className: "rounded-lg text-muted-foreground" })}
-            >
-              <ArrowLeft className="size-3.5" />
-              Back to console
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
             <a
               href={`/api/forms/${form.id}/responses`}
               className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-lg" })}
             >
               <Download className="size-3.5" />
               CSV
-            </a>
-            <a
-              href={`/api/forms/${form.id}/responses?format=excel`}
-              className={buttonVariants({ size: "sm", className: "rounded-lg" })}
-            >
-              <FileSpreadsheet className="size-3.5" />
-              Excel
             </a>
             <Link
               href={`/builder/${form.id}`}
@@ -209,8 +195,8 @@ export default async function FormResponsesPage({
               <Pencil className="size-3.5" />
               Edit form
             </Link>
+            </div>
           </div>
-        </div>
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/50 sm:grid-cols-3">
