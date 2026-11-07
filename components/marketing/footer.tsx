@@ -9,7 +9,7 @@ export function MarketingFooter() {
           <span className="relative flex size-6 items-center justify-center">
             <ThemeLogo />
           </span>
-          <span className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-foreground">
+          <span className="font-mono text-sm font-semibold uppercase tracking-[0.04em] text-foreground">
             FORMORA
           </span>
           <span className="text-border">·</span>

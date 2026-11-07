@@ -18,7 +18,7 @@ export function DashboardHeader({ name, email }: DashboardHeaderProps) {
             <span className="relative flex size-8 items-center justify-center">
               <ThemeLogo />
             </span>
-            <span className="font-mono text-base font-semibold uppercase tracking-[0.14em] text-foreground">
+            <span className="font-mono text-base font-semibold uppercase tracking-[0.04em] text-foreground">
               FORMORA
             </span>
           </Link>

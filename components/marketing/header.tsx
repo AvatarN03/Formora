@@ -18,7 +18,7 @@ export function MarketingHeader() {
             <span className="relative flex size-8 items-center justify-center">
               <ThemeLogo />
             </span>
-            <span className="font-mono text-base font-semibold uppercase tracking-[0.14em] leading-none text-foreground sm:text-lg">
+            <span className="font-mono text-base font-semibold uppercase tracking-[0.04em] leading-none text-foreground sm:text-lg">
               FORMORA
             </span>
           </Link>
