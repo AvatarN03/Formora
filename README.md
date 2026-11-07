@@ -13,7 +13,10 @@
 </p>
 
 <p align="center">
-  <img src="public/formora-home-preview.svg" alt="Formora landing page and form composition preview" width="100%" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./public/hero-dark.png" />
+    <img src="./public/hero.png" alt="Formora landing page and form composition preview" width="100%" />
+  </picture>
 </p>
 
 Formora is a product-oriented form composition platform for teams that care about completion, clarity, and control. It turns form creation into a visual workflow: authors arrange a form on an open canvas, configure each field in context, preview the respondent experience, and publish a polished public form from the same workspace.
