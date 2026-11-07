@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Check, CheckSquare, CircleDot, Hash, List, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Check, CheckSquare, CircleDot, Hash, List, Loader2, Tag } from "lucide-react";
 import { submitForm } from "@/actions/form";
 import type { FormElementInstance } from "./FormElements";
 import { ThemeToggle } from "./theme-toggle";
+import { ThemeLogo } from "./theme-logo";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FormSubmitComponentProps {
   formUrl: string;
@@ -23,6 +28,35 @@ function readOptions(element: FormElementInstance): string[] {
   return Array.isArray(value) && value.every((option) => typeof option === "string")
     ? (value as string[])
     : ["Option 1", "Option 2"];
+}
+
+function FormoraFooter() {
+  return (
+    <footer className="mt-6 px-2 text-center opacity-60 transition-opacity hover:opacity-80">
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-border" />
+        <div className="flex shrink-0 flex-col items-center">
+          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Powered by
+          </span>
+          <Link
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-semibold tracking-tight text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Go to Formora home"
+          >
+            <ThemeLogo className="size-10" />
+            <span className="text-lg">Formora</span>
+          </Link>
+        </div>
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent via-border to-border" />
+      </div>
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        Forms that feel effortless.
+      </p>
+    </footer>
+  );
 }
 
 export default function FormSubmitComponent({
@@ -50,7 +84,24 @@ export default function FormSubmitComponent({
     for (const element of content) {
       if (element.extraAttributes?.required) {
         const val = formValues[element.id];
-        if (val === undefined || val === null || val === "" || (typeof val === "boolean" && !val)) {
+        if (element.type === "Checkbox") {
+          const rawOptions = element.extraAttributes?.options;
+          const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
+          if (hasOptions) {
+            if (!Array.isArray(val) || val.length === 0) {
+              errors[element.id] = "Please select at least one option";
+            }
+          } else {
+            if (!val) {
+              errors[element.id] = "This field is required";
+            }
+          }
+        } else if (
+          val === undefined ||
+          val === null ||
+          val === "" ||
+          (typeof val === "boolean" && !val)
+        ) {
           errors[element.id] = "This field is required";
         }
       }
@@ -76,14 +127,17 @@ export default function FormSubmitComponent({
 
   if (submitted) {
     return (
-      <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center rounded-2xl border border-border/70 bg-card p-8 text-center shadow-xs sm:p-12">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <Check className="size-7" />
+      <div className="mx-auto w-full max-w-xl">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border/70 bg-card p-8 text-center shadow-xs sm:p-12">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Check className="size-7" />
+          </div>
+          <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground">Response Submitted</h2>
+          <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+            Thank you for your response! Your answers for <span className="font-semibold text-foreground">{name}</span> have been recorded.
+          </p>
         </div>
-        <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground">Response Submitted</h2>
-        <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-          Thank you for your response! Your answers for <span className="font-semibold text-foreground">{name}</span> have been recorded.
-        </p>
+        <FormoraFooter />
       </div>
     );
   }
@@ -127,6 +181,21 @@ export default function FormSubmitComponent({
                     {readText(element, "text", "")}
                   </p>
                 );
+              case "Label":
+                return (
+                  <div key={element.id} className="space-y-1">
+                    <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Tag className="size-3.5 text-primary" />
+                      <span>{readText(element, "text", "Label text")}</span>
+                      {required ? <span className="ml-1 text-primary">*</span> : null}
+                    </span>
+                    {element.extraAttributes?.helperText ? (
+                      <p className="text-xs text-muted-foreground">
+                        {readText(element, "helperText", "")}
+                      </p>
+                    ) : null}
+                  </div>
+                );
               case "Separator":
                 return <hr key={element.id} className="border-border/70" />;
               case "Spacer":
@@ -156,25 +225,36 @@ export default function FormSubmitComponent({
               case "Select": {
                 const options = readOptions(element);
                 return (
-                  <div key={element.id} className="space-y-1.5">
+                  <div key={element.id} className="space-y-2">
                     <label className="text-sm font-medium text-foreground">
                       {label}
                       {required ? <span className="ml-1 text-primary">*</span> : null}
                     </label>
                     <div className="flex items-center gap-2">
                       <List className="size-4 shrink-0 text-primary" />
-                      <select
+                      <Select
                         value={String(formValues[element.id] ?? "")}
-                        onChange={(e) => handleInputChange(element.id, e.target.value)}
-                        className="h-10 w-full rounded-lg border border-border/70 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        onValueChange={(value) => handleInputChange(element.id, value)}
                       >
-                        <option value="">Select an option...</option>
+                        <SelectTrigger className="h-10 w-full rounded-lg border-border/70 bg-background text-foreground">
+                          <SelectValue placeholder="Select an option..." />
+                        </SelectTrigger>
+                        <SelectContent>
                         {options.map((opt) => (
-                          <option key={opt} value={opt}>
+                          <SelectItem key={opt} value={opt}>
                             {opt}
-                          </option>
+                          </SelectItem>
                         ))}
-                      </select>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+                      {options.map((opt, idx) => (
+                        <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                          {opt}
+                        </span>
+                      ))}
                     </div>
                     {error ? <p className="text-xs text-destructive">{error}</p> : null}
                   </div>
@@ -200,15 +280,65 @@ export default function FormSubmitComponent({
                     {error ? <p className="text-xs text-destructive">{error}</p> : null}
                   </div>
                 );
-              case "Checkbox":
+              case "Checkbox": {
+                const rawOptions = element.extraAttributes?.options;
+                const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
+                const options = hasOptions ? (rawOptions as string[]) : [];
+
+                if (hasOptions) {
+                  const selected = Array.isArray(formValues[element.id])
+                    ? (formValues[element.id] as string[])
+                    : [];
+
+                  return (
+                    <fieldset key={element.id} className="space-y-2">
+                      <legend className="text-sm font-medium text-foreground">
+                        <CheckSquare className="mr-1.5 inline size-4 text-primary" />
+                        {label}
+                        {required ? <span className="ml-1 text-primary">*</span> : null}
+                      </legend>
+                      <div className="space-y-1.5 pl-6">
+                        {options.map((opt) => (
+                          <label
+                            key={opt}
+                            className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <Checkbox
+                              name={element.id}
+                              value={opt}
+                              checked={selected.includes(opt)}
+                              onCheckedChange={(checked) => {
+                                const next = checked === true
+                                  ? [...selected, opt]
+                                  : selected.filter((item) => item !== opt);
+                                handleInputChange(element.id, next);
+                              }}
+                              aria-label={opt}
+                            />
+                            <span>{opt}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+                        <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+                        {options.map((opt, idx) => (
+                          <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+                    </fieldset>
+                  );
+                }
+
                 return (
                   <div key={element.id} className="space-y-1">
-                    <label className="flex items-center gap-2.5 text-sm font-medium text-foreground">
-                      <input
-                        type="checkbox"
+                    <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-foreground">
+                      <Checkbox
                         checked={Boolean(formValues[element.id] ?? false)}
-                        onChange={(e) => handleInputChange(element.id, e.target.checked)}
-                        className="size-4 rounded border-border/70 text-primary accent-primary focus:ring-primary"
+                        onCheckedChange={(checked) => handleInputChange(element.id, checked === true)}
+                        aria-label={label}
                       />
                       <span>
                         {label}
@@ -218,6 +348,7 @@ export default function FormSubmitComponent({
                     {error ? <p className="text-xs text-destructive">{error}</p> : null}
                   </div>
                 );
+              }
               case "Radio": {
                 const options = readOptions(element);
                 return (
@@ -227,22 +358,27 @@ export default function FormSubmitComponent({
                       {label}
                       {required ? <span className="ml-1 text-primary">*</span> : null}
                     </legend>
-                    <div className="space-y-1.5 pl-6">
+                    <RadioGroup
+                      value={String(formValues[element.id] ?? "")}
+                      onValueChange={(value) => handleInputChange(element.id, value)}
+                      className="space-y-1.5 pl-6"
+                    >
                       {options.map((opt) => (
                         <label
                           key={opt}
-                          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                          className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                         >
-                          <input
-                            type="radio"
-                            name={element.id}
-                            value={opt}
-                            checked={formValues[element.id] === opt}
-                            onChange={(e) => handleInputChange(element.id, e.target.value)}
-                            className="size-4 text-primary accent-primary"
-                          />
+                          <RadioGroupItem value={opt} aria-label={opt} />
                           <span>{opt}</span>
                         </label>
+                      ))}
+                    </RadioGroup>
+                    <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+                      <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+                      {options.map((opt, idx) => (
+                        <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                          {opt}
+                        </span>
                       ))}
                     </div>
                     {error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -293,6 +429,7 @@ export default function FormSubmitComponent({
           </div>
         </form>
       </div>
+      <FormoraFooter />
     </div>
   );
 }

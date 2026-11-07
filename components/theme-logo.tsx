@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
 
 const emptySubscribe = () => () => {};
 
-export function ThemeLogo() {
+export function ThemeLogo({ className = "size-8" }: { className?: string }) {
   const { resolvedTheme } = useTheme();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
@@ -14,5 +14,5 @@ export function ThemeLogo() {
     ? "/formora-dark.svg"
     : "/formora-light.svg";
 
-  return <Image src={asset} alt="" width={32} height={32} className="size-8 object-contain" />;
+  return <Image src={asset} alt="" width={40} height={40} className={`${className} object-contain`} />;
 }
