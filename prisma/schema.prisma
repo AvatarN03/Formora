@@ -6,12 +6,19 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ResponsePolicy {
+  UNLIMITED
+  ONE_PER_BROWSER
+}
+
 model Form {
   id     Int    @id @default(autoincrement())
   userId String
 
   createdAt   DateTime @default(now())
   published   Boolean  @default(false)
+  responsePolicy ResponsePolicy @default(ONE_PER_BROWSER)
+  rateLimitPerHour Int @default(5)
   name        String
   description String   @default("")
   content     String   @default("[]")
@@ -27,10 +34,17 @@ model Form {
 }
 
 model FormSubmission {
-  id        Int      @id @default(autoincrement())
-  formId    Int
-  createdAt DateTime @default(now())
-  content   String
+  id                 Int      @id @default(autoincrement())
+  formId             Int
+  createdAt          DateTime @default(now())
+  content            String
+  submissionKeyHash  String?
+  browserTokenHash   String?
+  ipHash             String?
 
   form Form @relation(fields: [formId], references: [id])
+
+  @@unique([formId, submissionKeyHash])
+  @@unique([formId, browserTokenHash])
+  @@index([formId, ipHash, createdAt])
 }

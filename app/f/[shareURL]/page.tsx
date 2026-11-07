@@ -36,6 +36,7 @@ export default async function PublicFormPage({
         formUrl={shareURL}
         name={form.name}
         description={form.description}
+        responsePolicy={form.responsePolicy ?? "ONE_PER_BROWSER"}
         content={parseContent(form.content)}
       />
     </main>

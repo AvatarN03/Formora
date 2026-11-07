@@ -2,12 +2,14 @@
 
 import { useCallback, useState } from "react";
 import type { Form } from "@prisma/client";
-import { ArrowLeft, Check, Eye, EyeOff, Pencil, X } from "lucide-react";
+import { ArrowLeft, Check, Pencil, X } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 
 import PreviewDialogBtn from "@/components/PreviewDialogBtn";
 import PublishFormBtn, { PublishedFormDialog } from "@/components/PublishFormBtn";
 import SaveFormBtn from "@/components/SaveFormBtn";
+import ResponsePolicyControl from "@/components/ResponsePolicyControl";
+import RateLimitControl from "@/components/RateLimitControl";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { updateFormName, saveFormContent } from "@/actions/form";
@@ -222,6 +224,14 @@ const FormBuilder = ({ form }: { form: Form }) => {
               {/* Right: Actions */}
               <div className="flex items-center gap-2.5">
                 <ButtonGroup className="gap-2">
+                  <ResponsePolicyControl
+                    formId={String(form.id)}
+                    initialPolicy={form.responsePolicy ?? "ONE_PER_BROWSER"}
+                  />
+                  <RateLimitControl
+                    formId={String(form.id)}
+                    initialRateLimit={form.rateLimitPerHour}
+                  />
                   <PreviewDialogBtn
                     isPreviewing={isPreviewing}
                     onClick={() => setIsPreviewing((current) => !current)}

@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, CheckSquare, CircleDot, Hash, List, Loader2, Tag } from "lucide-react";
-import { submitForm } from "@/actions/form";
+import { getSubmissionStatus, submitForm } from "@/actions/form";
 import type { FormElementInstance } from "./FormElements";
 import { ThemeToggle } from "./theme-toggle";
 import { ThemeLogo } from "./theme-logo";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface FormSubmitComponentProps {
   formUrl: string;
   name: string;
   description: string;
+  responsePolicy: "UNLIMITED" | "ONE_PER_BROWSER";
   content: FormElementInstance[];
 }
 
@@ -63,14 +65,56 @@ export default function FormSubmitComponent({
   formUrl,
   name,
   description,
+  responsePolicy,
   content,
 }: FormSubmitComponentProps) {
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isCheckingSubmission, setIsCheckingSubmission] = useState(
+    responsePolicy === "ONE_PER_BROWSER",
+  );
   const [submitted, setSubmitted] = useState(false);
+  const [wasAlreadySubmitted, setWasAlreadySubmitted] = useState(false);
+
+  useEffect(() => {
+    if (responsePolicy !== "ONE_PER_BROWSER") {
+      return;
+    }
+
+    let active = true;
+    const storageKey = `formora:submission-key:${formUrl}`;
+    let hasLocalMarker = false;
+
+    try {
+      hasLocalMarker = Boolean(window.localStorage.getItem(storageKey));
+    } catch {
+      // The server-side signed cookie check still works when storage is blocked.
+    }
+
+    void getSubmissionStatus(formUrl)
+      .then((result) => {
+        if (!active) return;
+        if (result.alreadySubmitted || hasLocalMarker) {
+          setWasAlreadySubmitted(true);
+          setSubmitted(true);
+        }
+      })
+      .catch(() => {
+        // A status-check failure should not prevent a legitimate response.
+      })
+      .finally(() => {
+        if (active) setIsCheckingSubmission(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [formUrl, responsePolicy]);
 
   const handleInputChange = (elementId: string, value: unknown) => {
+    setSubmitError(null);
     setFormValues((prev) => ({ ...prev, [elementId]: value }));
     setFormErrors((prev) => {
       const next = { ...prev };
@@ -112,14 +156,44 @@ export default function FormSubmitComponent({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     if (!validate()) return;
 
     setIsSubmitting(true);
     try {
-      await submitForm(formUrl, JSON.stringify(formValues));
+      const storageKey = `formora:submission-key:${formUrl}`;
+      let submissionKey = crypto.randomUUID();
+
+      if (responsePolicy === "ONE_PER_BROWSER") {
+        try {
+          const storedKey = window.localStorage.getItem(storageKey);
+          if (storedKey) submissionKey = storedKey;
+          // Persist the marker only after the server accepts the response.
+        } catch {
+          // The signed HttpOnly browser token remains available when storage is blocked.
+        }
+      }
+
+      const result = await submitForm(
+        formUrl,
+        JSON.stringify(formValues),
+        submissionKey,
+      );
+      if (responsePolicy === "ONE_PER_BROWSER") {
+        try {
+          window.localStorage.setItem(storageKey, submissionKey);
+        } catch {
+          // The signed HttpOnly browser token remains available.
+        }
+      }
+      setWasAlreadySubmitted(result.duplicate);
       setSubmitted(true);
-    } catch {
-      alert("Something went wrong while submitting the form. Please try again.");
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error && error.message
+          ? error.message
+          : "Something went wrong while submitting the form. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -132,10 +206,26 @@ export default function FormSubmitComponent({
           <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Check className="size-7" />
           </div>
-          <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground">Response Submitted</h2>
+          <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground">
+            {wasAlreadySubmitted ? "Response Already Submitted" : "Response Submitted"}
+          </h2>
           <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-            Thank you for your response! Your answers for <span className="font-semibold text-foreground">{name}</span> have been recorded.
+            {wasAlreadySubmitted
+              ? "This form response was already received from this browser."
+              : <>Thank you for your response! Your answers for <span className="font-semibold text-foreground">{name}</span> have been recorded.</>}
           </p>
+        </div>
+        <FormoraFooter />
+      </div>
+    );
+  }
+
+  if (responsePolicy === "ONE_PER_BROWSER" && isCheckingSubmission) {
+    return (
+      <div className="mx-auto w-full max-w-xl">
+        <div className="rounded-2xl border border-border/70 bg-card p-8 text-center shadow-xs sm:p-12">
+          <Loader2 className="mx-auto size-6 animate-spin text-primary" />
+          <p className="mt-4 text-sm text-muted-foreground">Checking response status...</p>
         </div>
         <FormoraFooter />
       </div>
@@ -410,6 +500,15 @@ export default function FormSubmitComponent({
                 );
             }
           })}
+
+          {submitError ? (
+            <Alert variant="destructive">
+              <AlertTitle>We couldn&apos;t submit your response</AlertTitle>
+              <AlertDescription>
+                {submitError} Your answers are still here, so you can try again.
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
           <div className="pt-2">
             <button
