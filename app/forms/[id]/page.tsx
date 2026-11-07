@@ -7,6 +7,7 @@ import { getFormResponses } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
 import ResponseViewer from "@/components/ResponseViewer";
 import PublicFormLinkActions from "@/components/PublicFormLinkActions";
+import ResponsePageRefresh from "@/components/ResponsePageRefresh";
 
 type ResponseColumn = {
   id: string;
@@ -164,6 +165,7 @@ export default async function FormResponsesPage({
 
   return (
     <main data-console className="console-page relative min-h-screen overflow-hidden">
+      <ResponsePageRefresh />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-40 -top-40 -z-10 size-[520px] rounded-full bg-primary/[0.06] blur-[140px]"

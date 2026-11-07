@@ -588,9 +588,9 @@ function getClientLocationLabel(requestHeaders: Headers) {
     return null;
   };
 
-  const city = readHeader("x-vercel-ip-city", "cf-ipcity");
-  const region = readHeader("x-vercel-ip-country-region");
-  const country = readHeader("x-vercel-ip-country", "cf-ipcountry");
+  const city = readHeader("x-vercel-ip-city", "cf-ipcity", "x-geo-city", "x-city");
+  const region = readHeader("x-vercel-ip-country-region", "x-geo-region");
+  const country = readHeader("x-vercel-ip-country", "cf-ipcountry", "x-country-code");
   return [city, region, country].filter(Boolean).join(", ") || null;
 }
 
@@ -752,7 +752,7 @@ export const submitForm = async (
       : null;
 
   try {
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const submissions = hasLocationColumn
         ? await tx.$queryRaw<Array<{ id: number }>>`
             INSERT INTO "FormSubmission" (
@@ -781,6 +781,10 @@ export const submitForm = async (
 
       return { duplicate: false, submissionId: submissions[0].id };
     });
+
+    revalidatePath(`/forms/${form.id}`);
+    revalidatePath("/console");
+    return result;
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
