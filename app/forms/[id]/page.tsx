@@ -4,16 +4,8 @@ import { ArrowLeft, Download, Inbox, Pencil } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 
 import { getFormResponses } from "@/actions/form";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ResponseViewer from "@/components/ResponseViewer";
 
 type ResponseColumn = {
   id: string;
@@ -205,18 +197,14 @@ export default async function FormResponsesPage({
             <p className="mt-2 text-2xl font-semibold tracking-tight">{form.formSubmissions.length.toLocaleString()}</p>
           </div>
           <div className="bg-card/80 px-5 py-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Answer fields</p>
-            <p className="mt-2 text-2xl font-semibold tracking-tight">{columns.length.toLocaleString()}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Visits</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight">{form.visits.toLocaleString()}</p>
           </div>
           <div className="bg-card/80 px-5 py-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Collection status</p>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="size-2 rounded-full bg-primary" />
-              <span className="text-sm font-medium">Live response feed</span>
-              {form.submissions !== form.formSubmissions.length ? (
-                <Badge variant="secondary" className="rounded-full text-[10px]">Latest view</Badge>
-              ) : null}
-            </div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Submission rate</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight">
+              {form.visits > 0 ? `${((form.submissions / form.visits) * 100).toFixed(1)}%` : "0%"}
+            </p>
           </div>
         </div>
 
@@ -308,35 +296,14 @@ export default async function FormResponsesPage({
             </p>
           </div>
         ) : (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border/60 bg-card/60 shadow-xs">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead className="w-44">Submitted</TableHead>
-                  {columns.map((column) => (
-                    <TableHead key={column.id}>{column.label}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {form.formSubmissions.map((submission) => {
-                  const response = parseResponse(submission.content);
-                  return (
-                    <TableRow key={submission.id}>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {new Date(submission.createdAt).toLocaleString()}
-                      </TableCell>
-                      {columns.map((column) => (
-                        <TableCell key={column.id} className="max-w-xs truncate text-sm text-foreground">
-                          {formatResponseValue(response[column.id])}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+          <ResponseViewer
+            columns={columns.map(({ id, label }) => ({ id, label }))}
+            submissions={form.formSubmissions.map((submission) => ({
+              id: submission.id,
+              content: submission.content,
+              createdAt: submission.createdAt.toISOString(),
+            }))}
+          />
         )}
       </div>
     </main>

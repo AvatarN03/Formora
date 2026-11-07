@@ -117,6 +117,7 @@ export const getFormResponses = async (id: string) => {
       id: true,
       name: true,
       content: true,
+      visits: true,
       submissions: true,
       formSubmissions: {
         orderBy: { createdAt: "desc" },
