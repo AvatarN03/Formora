@@ -335,8 +335,11 @@ function getElementOptions(element: Record<string, unknown>) {
   if (!attributes || typeof attributes !== "object") return [];
 
   const options = (attributes as Record<string, unknown>).options;
-  return Array.isArray(options) && options.every((option) => typeof option === "string")
+  return Array.isArray(options)
     ? options
+        .filter((option): option is string => typeof option === "string")
+        .map((option) => option.trim())
+        .filter(Boolean)
     : [];
 }
 
@@ -439,26 +442,34 @@ function validateSubmission(formContent: string, submissionContent: string) {
       case "Select":
       case "Radio": {
         const options = getElementOptions(element);
-        if (typeof value !== "string" || !options.includes(value)) {
+        const normalizedValue = typeof value === "string" ? value.trim() : "";
+        if (!normalizedValue || !options.includes(normalizedValue)) {
           throw new Error("Invalid option selected");
         }
-        normalized[id] = value;
+        normalized[id] = normalizedValue;
         break;
       }
       case "Checkbox": {
         const options = getElementOptions(element);
         if (options.length > 0) {
+          const normalizedValues = Array.isArray(value)
+            ? value.map((option) =>
+                typeof option === "string" ? option.trim() : option,
+              )
+            : [];
           if (
             !Array.isArray(value) ||
             value.length > options.length ||
             value.some(
-              (option) => typeof option !== "string" || !options.includes(option),
+              (option) =>
+                typeof option !== "string" ||
+                !options.includes(option.trim()),
             ) ||
-            new Set(value).size !== value.length
+            new Set(normalizedValues).size !== normalizedValues.length
           ) {
             throw new Error("Invalid checkbox selection");
           }
-          normalized[id] = value;
+          normalized[id] = normalizedValues;
         } else {
           if (typeof value !== "boolean") {
             throw new Error("Invalid checkbox value");

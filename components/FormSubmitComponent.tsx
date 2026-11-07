@@ -27,9 +27,13 @@ function readText(element: FormElementInstance, key: string, fallback: string) {
 
 function readOptions(element: FormElementInstance): string[] {
   const value = element.extraAttributes?.options;
-  return Array.isArray(value) && value.every((option) => typeof option === "string")
-    ? (value as string[])
-    : ["Option 1", "Option 2"];
+  const options = Array.isArray(value)
+    ? value
+        .filter((option): option is string => typeof option === "string")
+        .map((option) => option.trim())
+        .filter(Boolean)
+    : [];
+  return options.length > 0 ? options : ["Option 1", "Option 2"];
 }
 
 function FormoraFooter() {
