@@ -156,14 +156,14 @@ export default async function FormResponsesPage({
         className="pointer-events-none absolute -bottom-48 -left-40 -z-10 size-[460px] rounded-full bg-orange-400/[0.04] blur-[130px]"
       />
 
-      <div className="mx-auto max-w-[96rem] px-5 py-8 sm:px-6 lg:px-10 lg:py-12">
-        <div className="border-b border-border/50 pb-8">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+      <div className="mx-auto max-w-[96rem] px-5 py-4 sm:px-6 lg:px-10 lg:py-6">
+        <div className="border-b border-border/60 pb-6">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground/75">
             <Link
               href="/console"
               aria-label="Back to console"
               title="Back to console"
-              className="inline-flex size-6 items-center justify-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              className="inline-flex size-6 items-center justify-center rounded-md border border-border bg-muted/60 text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-foreground"
             >
               <ArrowLeft className="size-3.5" />
             </Link>
@@ -172,7 +172,7 @@ export default async function FormResponsesPage({
             <span>Responses</span>
           </div>
 
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
                 <Inbox className="size-4" strokeWidth={1.8} />
@@ -183,14 +183,14 @@ export default async function FormResponsesPage({
             <div className="flex flex-wrap items-center gap-2">
             <a
               href={`/api/forms/${form.id}/responses`}
-              className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-lg" })}
+              className={buttonVariants({ size: "sm", className: "rounded-lg" })}
             >
               <Download className="size-3.5" />
               CSV
             </a>
             <Link
               href={`/builder/${form.id}`}
-              className={buttonVariants({ size: "sm", className: "rounded-lg" })}
+              className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-lg border-border bg-muted/50 text-foreground hover:bg-muted" })}
             >
               <Pencil className="size-3.5" />
               Edit form
