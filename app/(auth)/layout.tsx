@@ -25,9 +25,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         className="pointer-events-none absolute -bottom-32 -right-32 -z-10 size-[450px] rounded-full bg-gradient-to-tl from-primary/[0.05] via-orange-400/[0.02] to-transparent blur-[130px]"
       />
 
-      {/* Modern Top Header - full 7xl width */}
+      {/* Modern Top Header - matching landing navbar width */}
       <header className="auth-header absolute inset-x-0 top-0 z-20 border-b">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
+        <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative flex size-8 items-center justify-center">
               <ThemeLogo />
