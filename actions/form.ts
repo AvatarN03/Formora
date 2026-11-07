@@ -138,14 +138,30 @@ export const getFormResponses = async (id: string) => {
     throw new Error("Form not found");
   }
 
-  const formSubmissions = await prisma.$queryRaw<
-    Array<{ id: number; content: string; createdAt: Date; ipHash: string | null; locationLabel: string | null }>
-  >`
-    SELECT "id", "content", "createdAt", "ipHash", "locationLabel"
-    FROM "FormSubmission"
-    WHERE "formId" = ${form.id}
-    ORDER BY "createdAt" DESC
-  `;
+  const hasLocationColumn = await hasSubmissionLocationColumn();
+  const formSubmissions = hasLocationColumn
+    ? await prisma.$queryRaw<
+        Array<{
+          id: number;
+          content: string;
+          createdAt: Date;
+          ipHash: string | null;
+          locationLabel: string | null;
+        }>
+      >`
+        SELECT "id", "content", "createdAt", "ipHash", "locationLabel"
+        FROM "FormSubmission"
+        WHERE "formId" = ${form.id}
+        ORDER BY "createdAt" DESC
+      `
+    : await prisma.$queryRaw<
+        Array<{ id: number; content: string; createdAt: Date; ipHash: string | null }>
+      >`
+        SELECT "id", "content", "createdAt", "ipHash"
+        FROM "FormSubmission"
+        WHERE "formId" = ${form.id}
+        ORDER BY "createdAt" DESC
+      `.then((rows) => rows.map((row) => ({ ...row, locationLabel: null })));
 
   return { ...form, formSubmissions };
 };
@@ -578,6 +594,20 @@ function getClientLocationLabel(requestHeaders: Headers) {
   return [city, region, country].filter(Boolean).join(", ") || null;
 }
 
+async function hasSubmissionLocationColumn() {
+  const result = await prisma.$queryRaw<Array<{ exists: boolean }>>`
+    SELECT EXISTS(
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = 'FormSubmission'
+        AND column_name = 'locationLabel'
+    ) AS "exists"
+  `;
+
+  return Boolean(result[0]?.exists);
+}
+
 const browserTokenCookieName = "formora_browser_token";
 
 function getBrowserTokenSecret() {
@@ -687,6 +717,7 @@ export const submitForm = async (
   const requestHeaders = await headers();
   const ipHash = getClientIpHash(requestHeaders);
   const locationLabel = getClientLocationLabel(requestHeaders);
+  const hasLocationColumn = await hasSubmissionLocationColumn();
 
   const existingSubmission = await prisma.$queryRaw<Array<{ id: number }>>`
     SELECT "id"
@@ -722,15 +753,25 @@ export const submitForm = async (
 
   try {
     return await prisma.$transaction(async (tx) => {
-      const submissions = await tx.$queryRaw<Array<{ id: number }>>`
-        INSERT INTO "FormSubmission" (
-          "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash", "locationLabel"
-        )
-        VALUES (
-          ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}, ${locationLabel}
-        )
-        RETURNING "id"
-      `;
+      const submissions = hasLocationColumn
+        ? await tx.$queryRaw<Array<{ id: number }>>`
+            INSERT INTO "FormSubmission" (
+              "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash", "locationLabel"
+            )
+            VALUES (
+              ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}, ${locationLabel}
+            )
+            RETURNING "id"
+          `
+        : await tx.$queryRaw<Array<{ id: number }>>`
+            INSERT INTO "FormSubmission" (
+              "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash"
+            )
+            VALUES (
+              ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}
+            )
+            RETURNING "id"
+          `;
 
       await tx.$executeRaw`
         UPDATE "Form"
