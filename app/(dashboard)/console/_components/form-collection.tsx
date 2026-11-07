@@ -14,8 +14,8 @@ export async function FormCollection({ userId }: FormCollectionProps) {
 
 export function FormCollectionSkeleton() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-[#f2ede4] dark:border-border/50 dark:bg-[#13151b] overflow-hidden shadow-xs">
-      <div className="border-b border-border/60 bg-[#eae3d8] dark:border-border/40 dark:bg-[#161922] px-5 py-3.5 flex items-center justify-between gap-3">
+    <div className="rounded-2xl border border-border/60 bg-card/60 overflow-hidden shadow-xs">
+      <div className="border-b border-border/50 bg-muted/40 px-5 py-3.5 flex items-center justify-between gap-3">
         <Skeleton className="h-9 w-60 rounded-lg" />
         <Skeleton className="h-9 w-64 rounded-lg" />
       </div>
@@ -23,7 +23,7 @@ export function FormCollectionSkeleton() {
         {Array.from({ length: 3 }).map((_, idx) => (
           <div
             key={idx}
-            className="rounded-xl border border-border/80 bg-card dark:bg-[#1c202a] dark:border-white/[0.08] p-5 space-y-3"
+            className="rounded-xl border border-border/70 bg-card p-5 space-y-3 shadow-xs"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-4 w-32 rounded-md" />
