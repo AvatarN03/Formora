@@ -80,7 +80,7 @@ export const createForm = async (data: FormValues) => {
   }
 
   revalidatePath("/console");
-  redirect(`/builder/${form.id}`);
+  return form.id;
 }
 
 
