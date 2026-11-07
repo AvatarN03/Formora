@@ -21,23 +21,27 @@ export default function DragOverlayWrapper() {
 
   const formElement = FormElements[source.data.type];
   const Icon = formElement.designerBtn.icon;
-  const actionLabel = source.data.isExistingElement ? "Move" : "Add";
+  const actionLabel = source.data.isExistingElement ? "Moving" : "Adding";
 
   return (
     <DragOverlay dropAnimation={null}>
       <div
         className={cn(
-          "flex h-20 w-full min-w-64 items-center gap-3 border border-[var(--builder-signal)] bg-[var(--builder-card)] px-4 text-[11px] font-bold uppercase tracking-[0.04em] text-[var(--builder-ink)] shadow-[8px_8px_0_var(--builder-signal)]",
+          "flex h-16 w-full min-w-60 items-center gap-3 rounded-xl border border-primary/40 bg-card px-4 shadow-xl ring-2 ring-primary/20 backdrop-blur-sm",
         )}
       >
-        <Icon className="size-5 text-[var(--builder-signal)]" />
-        <div className="flex flex-col gap-1">
-          <span className="text-[9px] tracking-[0.16em] text-[var(--builder-signal)]">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon className="size-4" />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
             {actionLabel}
           </span>
-          <span>{formElement.designerBtn.label}</span>
+          <span className="text-xs font-medium text-foreground">
+            {formElement.designerBtn.label}
+          </span>
         </div>
-        <div className="ml-auto h-8 w-2/5 rounded-md bg-muted" />
+        <div className="ml-auto h-7 w-1/4 animate-pulse rounded-md bg-muted" />
       </div>
     </DragOverlay>
   );

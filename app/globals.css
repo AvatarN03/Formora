@@ -746,87 +746,93 @@ body {
 }
 
 [data-builder] {
-  --builder-paper: #f2efe9;
-  --builder-ink: #171717;
+  --background: #f7f4ed;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #e33b2f;
+  --primary-foreground: #ffffff;
+  --secondary: #eee9e0;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0ebe2;
+  --muted-foreground: #4a453e;
+  --accent: #e33b2f;
+  --accent-foreground: #ffffff;
+  --border: #e2dcd2;
+  --input: #d1cbc0;
+  --ring: #e33b2f;
+  --builder-paper: #f7f4ed;
+  --builder-ink: #1a1a1a;
   --builder-signal: #e33b2f;
-  --builder-card: #fffdf8;
-  --builder-line: rgba(23, 23, 23, 0.2);
-  --builder-muted: rgba(23, 23, 23, 0.55);
+  --builder-card: #ffffff;
+  --builder-line: #e2dcd2;
+  --builder-muted: #4a453e;
   color-scheme: light;
 }
 
 [data-builder].dark,
 .dark [data-builder] {
-  --builder-paper: #111318;
-  --builder-ink: #f4f1e8;
+  --background: #111317;
+  --foreground: #f2efe9;
+  --card: #181b22;
+  --card-foreground: #f2efe9;
+  --popover: #181b22;
+  --popover-foreground: #f2efe9;
+  --primary: #ff6b52;
+  --primary-foreground: #111317;
+  --secondary: #222630;
+  --secondary-foreground: #f2efe9;
+  --muted: #1e222a;
+  --muted-foreground: #a6a096;
+  --accent: #ff6b52;
+  --accent-foreground: #111317;
+  --border: #262a34;
+  --input: #3b404d;
+  --ring: #ff6b52;
+  --builder-paper: #111317;
+  --builder-ink: #f2efe9;
   --builder-signal: #ff6b52;
-  --builder-card: #1a1d23;
-  --builder-line: rgba(244, 241, 232, 0.22);
-  --builder-muted: rgba(244, 241, 232, 0.58);
+  --builder-card: #181b22;
+  --builder-line: #262a34;
+  --builder-muted: #a6a096;
   color-scheme: dark;
 }
 
 [data-builder] .builder-ink {
-  color: var(--builder-ink);
+  color: var(--foreground);
 }
 
 [data-builder] .builder-muted {
-  color: var(--builder-muted);
+  color: var(--muted-foreground);
 }
 
 [data-builder] .builder-signal {
-  color: var(--builder-signal);
+  color: var(--primary);
 }
 
 [data-builder] .builder-action {
-  border-color: var(--builder-line);
-  background: transparent;
-  color: var(--builder-ink);
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  border-radius: 0.75rem;
 }
 
 [data-builder] .builder-action:hover {
-  border-color: var(--builder-signal);
-  color: var(--builder-signal);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 [data-builder] .builder-action-primary {
-  border-color: var(--builder-signal);
-  background: var(--builder-signal);
-  color: #fffdf8;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 0.75rem;
 }
 
 [data-builder] .builder-action-primary:hover {
-  background: color-mix(in srgb, var(--builder-signal) 86%, var(--builder-ink));
-}
-
-[data-builder] .builder-theme-toggle {
-  border-color: var(--builder-line);
-  background: transparent;
-  color: var(--builder-ink);
-}
-
-[data-builder] .builder-theme-toggle:hover {
-  border-color: var(--builder-signal);
-  background: color-mix(in srgb, var(--builder-signal) 8%, transparent);
-  color: var(--builder-signal);
-}
-
-[data-builder] .builder-button-group {
-  border-radius: 0.25rem;
-}
-
-[data-builder] .builder-button-group > [data-slot="button"] {
-  border-radius: 0;
-}
-
-[data-builder] .builder-button-group > [data-slot="button"]:first-child {
-  border-top-left-radius: 0.25rem;
-  border-bottom-left-radius: 0.25rem;
-}
-
-[data-builder] .builder-button-group > [data-slot="button"]:last-child {
-  border-top-right-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
+  background: color-mix(in srgb, var(--primary) 88%, black);
 }
 
 [data-builder] button,
@@ -836,46 +842,44 @@ body {
 }
 
 [data-builder] .builder-workspace {
-  background-color: var(--builder-paper);
-  background-image: linear-gradient(rgba(23, 23, 23, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 23, 23, 0.06) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-color: var(--background);
+  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 [data-builder] .builder-topbar {
-  box-shadow: 0 1px 0 rgba(23, 23, 23, 0.08);
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  backdrop-filter: blur(14px);
 }
 
 [data-builder] .builder-icon-button {
   display: inline-flex;
-  height: 2rem;
-  width: 2rem;
+  height: 2.25rem;
+  width: 2.25rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--builder-line);
-  color: var(--builder-ink);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
 }
 
 [data-builder] .builder-icon-button:hover {
-  border-color: var(--builder-signal);
-  color: var(--builder-signal);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 [data-builder] .builder-canvas {
-  background: var(--builder-card);
-  box-shadow: 10px 10px 0 rgba(23, 23, 23, 0.08);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 10px 24px -6px rgba(0, 0, 0, 0.04);
 }
 
 [data-builder] .builder-rail {
-  box-shadow: 6px 6px 0 rgba(23, 23, 23, 0.08);
-}
-
-.dark [data-builder] .builder-canvas,
-[data-builder].dark .builder-canvas {
-  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.28);
-}
-
-.dark [data-builder] .builder-rail,
-[data-builder].dark .builder-rail {
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.28);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }

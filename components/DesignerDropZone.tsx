@@ -25,29 +25,31 @@ export default function DesignerDropZone({
     <div
       ref={ref}
       className={cn(
-        "flex w-full shrink-0 items-center justify-center rounded-sm transition-all",
+        "flex w-full shrink-0 items-center justify-center rounded-xl transition-all",
         isDropTarget
-          ? "min-h-20 border border-dashed border-primary/60 bg-primary/5 px-2"
+          ? "min-h-20 border-2 border-dashed border-primary bg-primary/5 px-3 shadow-xs"
           : isDragging && isBottom
-            ? "min-h-28 border border-dashed border-border/60 bg-muted/20"
+            ? "min-h-24 border border-dashed border-primary/40 bg-primary/5"
             : isDragging
-              ? "h-14 border border-dashed border-border/60 bg-muted/10"
-              : "h-4",
+              ? "h-12 border border-dashed border-border/70 bg-muted/30"
+              : "h-3",
       )}
     >
       {isDropTarget && formElement && Icon ? (
-        <div className="flex w-full flex-col gap-2 px-4">
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
-            <span className="h-px flex-1 bg-primary/60" />
+        <div className="flex w-full flex-col gap-2 px-3 py-2">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-primary">
+            <span className="h-px flex-1 bg-primary/30" />
             <span>Drop here</span>
-            <span className="h-px flex-1 bg-primary/60" />
+            <span className="h-px flex-1 bg-primary/30" />
           </div>
           <div className="flex items-center gap-3">
-            <Icon className="size-5 text-primary" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Icon className="size-4" />
+            </div>
             <span className="text-sm font-medium text-foreground">
               {formElement.designerBtn.label}
             </span>
-            <div className="ml-auto h-8 w-2/5 animate-pulse rounded-md bg-muted" />
+            <div className="ml-auto h-7 w-1/3 animate-pulse rounded-md bg-muted" />
           </div>
         </div>
       ) : null}

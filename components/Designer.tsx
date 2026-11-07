@@ -13,7 +13,7 @@ import {
   type SetStateAction,
   useState,
 } from "react";
-import { Trash2 } from "lucide-react";
+import { Copy, GripVertical, Layers, RotateCcw, Trash2 } from "lucide-react";
 
 import {
   FormElements,
@@ -25,13 +25,16 @@ import {
 
 import DesignerDropZone from "./DesignerDropZone";
 import DesignerSidebar from "./DesignerSidebar";
+import { ClearCanvasDialog } from "./ClearCanvasDialog";
+import { cn } from "cn";
 
 interface DesignerProps {
+  formName: string;
   elements: FormElementInstance[];
   onElementsChange: Dispatch<SetStateAction<FormElementInstance[]>>;
 }
 
-const Designer = ({ elements, onElementsChange }: DesignerProps) => {
+const Designer = ({ formName, elements, onElementsChange }: DesignerProps) => {
   const { ref: canvasRef } = useDroppable({ id: "designer-canvas" });
   const { source } = useDragOperation<{
     type?: ElementsType;
@@ -48,15 +51,11 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
     elementId?: string;
   }>({
     onDragEnd(event) {
-      if (event.canceled) {
-        return;
-      }
+      if (event.canceled) return;
 
       const targetId = event.operation.target?.id;
       const data = event.operation.source?.data;
-      if (typeof targetId !== "string" || !data) {
-        return;
-      }
+      if (typeof targetId !== "string" || !data) return;
 
       const insertionIndex = targetId.startsWith("designer-drop-")
         ? Number(targetId.replace("designer-drop-", ""))
@@ -70,45 +69,42 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
         if (
           insertionIndex !== undefined &&
           (!Number.isInteger(insertionIndex) || insertionIndex < 0)
-        ) {
-          return;
-        }
+        ) return;
 
         onElementsChange((currentElements) => {
-          const sourceIndex = currentElements.findIndex(({ id }) => id === data.elementId);
+          const sourceIndex = currentElements.findIndex(
+            ({ id }) => id === data.elementId,
+          );
           if (
             sourceIndex < 0 ||
             (insertionIndex !== undefined && insertionIndex === sourceIndex)
-          ) {
-            return currentElements;
-          }
+          ) return currentElements;
 
           const nextElements = [...currentElements];
           const [movedElement] = nextElements.splice(sourceIndex, 1);
-          if (!movedElement) {
-            return currentElements;
-          }
-          const targetIndex = Math.min(insertionIndex ?? currentElements.length, nextElements.length);
-          const adjustedIndex = insertionIndex !== undefined && sourceIndex < insertionIndex
-            ? targetIndex - 1
-            : targetIndex;
+          if (!movedElement) return currentElements;
+
+          const targetIndex = Math.min(
+            insertionIndex ?? currentElements.length,
+            nextElements.length,
+          );
+          const adjustedIndex =
+            insertionIndex !== undefined && sourceIndex < insertionIndex
+              ? targetIndex - 1
+              : targetIndex;
           nextElements.splice(adjustedIndex, 0, movedElement);
           return nextElements;
         });
         return;
       }
 
-      if (!data.isDesignerElement || !data.type) {
-        return;
-      }
+      if (!data.isDesignerElement || !data.type) return;
 
       const elementType = data.type;
       if (
         insertionIndex !== undefined &&
         (!Number.isInteger(insertionIndex) || insertionIndex < 0)
-      ) {
-        return;
-      }
+      ) return;
 
       onElementsChange((currentElements) => {
         const nextElements = [...currentElements];
@@ -122,26 +118,78 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
     },
   });
 
-  const activeType = source?.data.isDesignerElement ? source.data.type : undefined;
+  /** Add element to end of canvas (from sidebar click) */
+  const appendElement = (type: ElementsType) => {
+    const newElement = FormElements[type].constuct(crypto.randomUUID());
+    onElementsChange((prev) => [...prev, newElement]);
+    setSelectedElementId(newElement.id);
+  };
+
+  const activeType = source?.data.isDesignerElement
+    ? source.data.type
+    : undefined;
   const activeElement = activeType ? FormElements[activeType] : undefined;
   const selectedInstance = elements.find(({ id }) => id === selectedElementId);
-  const selectedElement = selectedInstance ? FormElements[selectedInstance.type] : undefined;
+  const selectedElement = selectedInstance
+    ? FormElements[selectedInstance.type]
+    : undefined;
   const isDragging = Boolean(activeElement);
 
   return (
-    <div className="builder-layout flex h-full w-full flex-col gap-5 xl:flex-row">
+    <div className="flex h-full w-full flex-col gap-6 xl:flex-row">
       <p id="designer-drag-instructions" className="sr-only">
-        Drag fields to the canvas to add them. Drag existing fields to reorder them.
+        Click to add an element. Use the drag handle to reorder elements on the
+        canvas. Click an element on the canvas to edit its properties.
       </p>
+
+      {/* Main Canvas Area */}
       <div
         ref={canvasRef}
-        className={`builder-canvas m-auto flex min-h-[600px] h-full w-full max-w-[920px] flex-col items-center justify-start border transition-colors lg:min-h-[800px] ${isDragging ? "border-[var(--builder-signal)]" : "border-[var(--builder-ink)]/25"}`}
+        className={cn(
+          "m-auto flex min-h-[640px] h-full w-full max-w-[880px] flex-col items-center justify-start rounded-2xl border bg-card p-6 shadow-xs transition-all lg:min-h-[820px] lg:p-8",
+          isDragging
+            ? "border-primary/50 ring-2 ring-primary/20 bg-card/95"
+            : "border-border/70",
+        )}
       >
-        <div className="flex w-full items-center justify-between border-b border-[#171717]/15 px-5 py-3">
-          <span className="builder-muted text-[10px] font-bold uppercase tracking-[0.18em]">Canvas / {elements.length.toString().padStart(2, "0")} fields</span>
-          <span className="builder-muted text-[10px] font-mono">A4 · 01</span>
+        {/* Canvas Header */}
+        <div className="mb-6 flex w-full items-center justify-between border-b border-border/60 pb-3.5">
+          <div className="flex items-center gap-2.5">
+            {/* Form name badge */}
+            <span className="max-w-[220px] truncate text-sm font-semibold tracking-tight text-foreground sm:max-w-xs">
+              {formName || "Untitled Form"}
+            </span>
+            <span className="rounded-full bg-muted/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+              {elements.length}{" "}
+              {elements.length === 1 ? "field" : "fields"}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            {elements.length > 0 ? (
+              <ClearCanvasDialog
+                formName={formName}
+                onConfirm={() => {
+                  onElementsChange([]);
+                  setSelectedElementId(undefined);
+                }}
+              >
+                <button
+                  type="button"
+                  className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-destructive"
+                >
+                  <RotateCcw className="size-3" />
+                  <span>Clear all</span>
+                </button>
+              </ClearCanvasDialog>
+            ) : null}
+            <span className="text-xs text-muted-foreground/60">
+              Click element to edit
+            </span>
+          </div>
         </div>
-        <div className="flex w-full flex-col gap-3 p-5 sm:p-8">
+
+        {/* Canvas Drop Area */}
+        <div className="flex w-full flex-col gap-3">
           <DesignerDropZone
             id="designer-drop-0"
             formElement={activeElement}
@@ -150,7 +198,8 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
 
           {elements.length > 0 ? (
             elements.map((element, index) => {
-              const DesignerComponent = FormElements[element.type].designerComponent;
+              const DesignerComponent =
+                FormElements[element.type].designerComponent;
               return (
                 <Fragment key={element.id}>
                   <DesignerFieldDropTarget
@@ -159,20 +208,31 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
                     elementType={element.type}
                     isSelected={selectedElementId === element.id}
                     onClick={() => setSelectedElementId(element.id)}
+                    onDuplicate={() => {
+                      const duplicateElement: FormElementInstance = {
+                        ...element,
+                        id: crypto.randomUUID(),
+                        extraAttributes: element.extraAttributes
+                          ? JSON.parse(JSON.stringify(element.extraAttributes))
+                          : undefined,
+                      };
+                      onElementsChange((currentElements) => {
+                        const next = [...currentElements];
+                        next.splice(index + 1, 0, duplicateElement);
+                        return next;
+                      });
+                      setSelectedElementId(duplicateElement.id);
+                    }}
+                    onDelete={() => {
+                      onElementsChange((currentElements) =>
+                        currentElements.filter(({ id }) => id !== element.id),
+                      );
+                      setSelectedElementId((currentId) =>
+                        currentId === element.id ? undefined : currentId,
+                      );
+                    }}
                   >
                     <DesignerComponent element={element} />
-                    <button
-                      type="button"
-                      aria-label={`Delete ${FormElements[element.type].designerBtn.label}`}
-                      className="absolute right-2 top-2 z-10 hidden rounded-sm border border-destructive/40 bg-background p-1.5 text-destructive shadow-sm group-hover:block"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onElementsChange((currentElements) => currentElements.filter(({ id }) => id !== element.id));
-                        setSelectedElementId((currentId) => currentId === element.id ? undefined : currentId);
-                      }}
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
                   </DesignerFieldDropTarget>
                   <DesignerDropZone
                     id={`designer-drop-${index + 1}`}
@@ -184,21 +244,35 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
               );
             })
           ) : !activeElement ? (
-            <p className="builder-muted flex min-h-28 items-center justify-center border border-dashed border-[var(--builder-ink)]/30 text-[11px] font-bold uppercase tracking-[0.18em]">
-              Drop field here
-            </p>
+            <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 p-8 text-center">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Layers className="size-6" />
+              </div>
+              <h3 className="mt-3 text-sm font-semibold text-foreground">
+                Canvas is empty
+              </h3>
+              <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+                Click any element in the sidebar to add it here, or drag it to
+                a specific position.
+              </p>
+            </div>
           ) : null}
         </div>
       </div>
+
+      {/* Sidebar */}
       <DesignerSidebar
         layoutElements={LayoutElements}
         formElements={FormFieldElements}
         selectedElement={selectedElement}
         selectedInstance={selectedInstance}
+        onAddElement={appendElement}
         onUpdateElement={(updatedElement) => {
-          onElementsChange((currentElements) => currentElements.map((element) => (
-            element.id === updatedElement.id ? updatedElement : element
-          )));
+          onElementsChange((currentElements) =>
+            currentElements.map((element) =>
+              element.id === updatedElement.id ? updatedElement : element,
+            ),
+          );
         }}
         onBack={() => setSelectedElementId(undefined)}
       />
@@ -206,12 +280,18 @@ const Designer = ({ elements, onElementsChange }: DesignerProps) => {
   );
 };
 
+/* ------------------------------------------------------------------ */
+/* DesignerFieldDropTarget                                              */
+/* ------------------------------------------------------------------ */
+
 interface DesignerFieldDropTargetProps {
   id: string;
   elementId: string;
   elementType: ElementsType;
   isSelected: boolean;
   onClick: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
   children: ReactNode;
 }
 
@@ -221,9 +301,15 @@ function DesignerFieldDropTarget({
   elementType,
   isSelected,
   onClick,
+  onDuplicate,
+  onDelete,
   children,
 }: DesignerFieldDropTargetProps) {
-  const { isDragging, ref: draggableRef } = useDraggable({
+  /**
+   * We attach `useDraggable` to the grip handle only (via its own ref),
+   * so the rest of the card is click-to-select, not drag-to-reorder.
+   */
+  const { isDragging, ref: gripRef } = useDraggable({
     id: `designer-existing-${elementId}`,
     data: {
       isExistingElement: true,
@@ -231,23 +317,24 @@ function DesignerFieldDropTarget({
       type: elementType,
     },
   });
-  const { isDropTarget, ref } = useDroppable({ id });
+  const { isDropTarget, ref: dropRef } = useDroppable({ id });
 
   return (
     <div
-      ref={draggableRef}
       role="button"
       tabIndex={0}
-      aria-roledescription="draggable field"
-      aria-label="Drag field to reorder"
+      aria-roledescription="form field"
+      aria-label={`${elementType} field — click to edit properties`}
       aria-describedby="designer-drag-instructions"
-      className={`group relative w-full cursor-pointer touch-none rounded-sm transition-all ${
+      className={cn(
+        "group relative w-full cursor-pointer rounded-xl transition-all select-none",
         isDropTarget
           ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
           : isSelected
-            ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-            : "hover:ring-1 hover:ring-primary/60"
-      } ${isDragging ? "opacity-50" : ""}`}
+            ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-xs"
+            : "hover:ring-1 hover:ring-primary/50",
+        isDragging && "opacity-40",
+      )}
       onClick={onClick}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -256,16 +343,62 @@ function DesignerFieldDropTarget({
         }
       }}
     >
+      {/* Drop-before indicator */}
       {isDropTarget ? (
-        <div className="pointer-events-none absolute -top-3 left-0 z-10 flex w-full items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
-          <span className="h-0.5 flex-1 bg-primary" />
-          <span className="rounded-sm bg-primary px-2 py-1 text-primary-foreground shadow-sm">
+        <div className="pointer-events-none absolute -top-3 left-0 z-20 flex w-full items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-primary">
+          <span className="h-0.5 flex-1 bg-primary/70" />
+          <span className="rounded-full bg-primary px-2.5 py-0.5 text-primary-foreground shadow-xs">
             Drop before
           </span>
-          <span className="h-0.5 flex-1 bg-primary" />
+          <span className="h-0.5 flex-1 bg-primary/70" />
         </div>
       ) : null}
-      <div ref={ref}>{children}</div>
+
+      {/* Drop-target ref wrapper */}
+      <div ref={dropRef}>{children}</div>
+
+      {/* Drag grip handle — only this initiates dragging */}
+      <div
+        ref={gripRef}
+        onClick={(e) => e.stopPropagation()}
+        title="Drag to reorder"
+        aria-label="Drag handle — drag to reorder this field"
+        role="button"
+        tabIndex={0}
+        className={cn(
+          "absolute left-2 top-1/2 z-20 -translate-y-1/2 cursor-grab touch-none rounded-md p-1 text-muted-foreground/40 opacity-0 transition-all",
+          "group-hover:opacity-100 hover:bg-muted hover:text-muted-foreground active:cursor-grabbing",
+        )}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="size-4" />
+      </div>
+
+      {/* Action buttons — Duplicate + Delete */}
+      <div className="absolute right-2 top-2 z-20 hidden items-center gap-0.5 rounded-lg border border-border/70 bg-card/95 p-0.5 shadow-2xs backdrop-blur-sm group-hover:flex">
+        <button
+          type="button"
+          title="Duplicate"
+          className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate();
+          }}
+        >
+          <Copy className="size-3.5" />
+        </button>
+        <button
+          type="button"
+          title="Delete"
+          className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      </div>
     </div>
   );
 }
