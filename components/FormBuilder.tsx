@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import type { Form } from "@prisma/client";
 import { ArrowLeft, Check, Eye, EyeOff, Pencil, X } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 
 import PreviewDialogBtn from "@/components/PreviewDialogBtn";
-import PublishFormBtn from "@/components/PublishFormBtn";
+import PublishFormBtn, { PublishedFormDialog } from "@/components/PublishFormBtn";
 import SaveFormBtn from "@/components/SaveFormBtn";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -52,21 +52,21 @@ const FormBuilder = ({ form }: { form: Form }) => {
   const [isSavingName, setIsSavingName] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isPublished, setIsPublished] = useState(form.published);
+  const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
   // Track "saved snapshot" to detect unsaved changes
-  const savedContentRef = useRef<string>(form.content);
+  const [savedContent, setSavedContent] = useState(form.content);
   const [elements, setElements] = useState<FormElementInstance[]>(() =>
     readFormElements(form.content),
   );
 
   const currentContent = JSON.stringify(elements);
-  const hasUnsavedChanges =
-    !isPublished && currentContent !== savedContentRef.current;
+  const hasUnsavedChanges = currentContent !== savedContent;
 
   /* ── Save helper (also used by unsaved-changes guard) ── */
   const handleSave = useCallback(async () => {
     await saveFormContent(String(form.id), currentContent);
-    savedContentRef.current = currentContent;
+    setSavedContent(currentContent);
   }, [form.id, currentContent]);
 
   /* ── Unsaved changes guard ── */
@@ -81,7 +81,7 @@ const FormBuilder = ({ form }: { form: Form }) => {
     hasUnsavedChanges,
     onSave: handleSave,
     onDiscard: () => {
-      savedContentRef.current = currentContent; // mark clean so no double guard
+      setSavedContent(currentContent); // mark clean so no double guard
     },
   });
 
@@ -113,6 +113,11 @@ const FormBuilder = ({ form }: { form: Form }) => {
         onSave={() => void handleSaveAndNavigate()}
         onDiscard={handleDiscard}
         onCancel={handleCancel}
+      />
+
+      <PublishedFormDialog
+        publicUrl={publishedUrl}
+        onClose={() => setPublishedUrl(null)}
       />
 
       <DragDropProvider
@@ -221,24 +226,23 @@ const FormBuilder = ({ form }: { form: Form }) => {
                     isPreviewing={isPreviewing}
                     onClick={() => setIsPreviewing((current) => !current)}
                   />
-                  {!isPublished && (
-                    <SaveFormBtn
-                      formId={String(form.id)}
-                      elements={elements}
-                      onSaved={() => {
-                        savedContentRef.current = currentContent;
-                      }}
-                    />
-                  )}
+                  <SaveFormBtn
+                    formId={String(form.id)}
+                    elements={elements}
+                    onSaved={() => {
+                      setSavedContent(currentContent);
+                    }}
+                  />
                 </ButtonGroup>
 
                 {!isPublished && (
                   <PublishFormBtn
                     formId={String(form.id)}
                     elements={elements}
-                    onPublished={() => {
-                      savedContentRef.current = currentContent;
+                    onPublished={(publicURL) => {
+                      setSavedContent(currentContent);
                       setIsPublished(true);
+                      setPublishedUrl(publicURL);
                     }}
                   />
                 )}

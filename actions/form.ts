@@ -145,14 +145,55 @@ export const updateFormName = async (id: string, name: string) => {
   return trimmedName;
 };
 
-function validateContent(content: string) {
+const supportedElementTypes = new Set([
+  "TextField",
+  "H1",
+  "H2",
+  "Paragraph",
+  "Label",
+  "Separator",
+  "Spacer",
+  "DatePicker",
+  "Select",
+  "NumberField",
+  "Checkbox",
+  "Radio",
+]);
+
+function validateContent(content: string, requireElements = false) {
   try {
     const parsed: unknown = JSON.parse(content);
-    if (!Array.isArray(parsed)) {
+    if (!Array.isArray(parsed) || (requireElements && parsed.length === 0)) {
       throw new Error("Invalid form content");
     }
+
+    const ids = new Set<string>();
+    for (const element of parsed) {
+      if (!element || typeof element !== "object") {
+        throw new Error("Invalid form element");
+      }
+
+      const candidate = element as Record<string, unknown>;
+      if (
+        typeof candidate.id !== "string" ||
+        !candidate.id.trim() ||
+        ids.has(candidate.id) ||
+        typeof candidate.type !== "string" ||
+        !supportedElementTypes.has(candidate.type)
+      ) {
+        throw new Error("Invalid form element");
+      }
+
+      ids.add(candidate.id);
+    }
+
+    return parsed;
   } catch {
-    throw new Error("Invalid form content");
+    throw new Error(
+      requireElements
+        ? "Add at least one valid element before publishing"
+        : "Invalid form content",
+    );
   }
 }
 
@@ -185,27 +226,31 @@ export const publishForm = async (id: string, content: string) => {
     throw new Error("Unauthorized");
   }
 
-  validateContent(content);
+  validateContent(content, true);
 
-  const result = await prisma.form.updateMany({
-    where: { id: Number(id), userId },
-    data: { content, published: true },
-  });
+  const shareURL = await prisma.$transaction(async (tx) => {
+    const form = await tx.form.findFirst({
+      where: { id: Number(id), userId },
+      select: { id: true, shareURL: true },
+    });
 
-  if (result.count === 0) {
-    throw new Error("Form not found");
-  }
+    if (!form) {
+      throw new Error("Form not found");
+    }
 
-  const form = await prisma.form.findFirst({
-    where: { id: Number(id), userId },
-    select: { shareURL: true },
+    await tx.form.update({
+      where: { id: form.id },
+      data: { content, published: true },
+    });
+
+    return form.shareURL;
   });
 
   revalidatePath(`/builder/${id}`);
   revalidatePath(`/builder/${id}/preview`);
   revalidatePath("/console");
 
-  return form?.shareURL ?? "";
+  return shareURL;
 };
 
 export const submitForm = async (shareURL: string, content: string) => {
