@@ -121,7 +121,7 @@ export const getFormResponses = async (id: string) => {
       submissions: true,
       formSubmissions: {
         orderBy: { createdAt: "desc" },
-        select: { id: true, content: true, createdAt: true },
+        select: { id: true, content: true, createdAt: true, ipHash: true },
       },
     },
   });

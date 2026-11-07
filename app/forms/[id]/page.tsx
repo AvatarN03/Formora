@@ -70,6 +70,10 @@ function getResponseInsights(
       .filter((value) => value !== undefined && value !== null && value !== "");
     const distribution = new Map<string, number>();
 
+    if (["Select", "Radio", "Checkbox"].includes(column.type)) {
+      for (const option of column.options) distribution.set(option, 0);
+    }
+
     for (const value of values) {
       const list = Array.isArray(value) ? value : [value];
       for (const item of list) {
@@ -136,6 +140,21 @@ export default async function FormResponsesPage({
 
   const columns = getResponseColumns(form.content);
   const insights = getResponseInsights(columns, form.formSubmissions);
+  const networkGroupLabels = new Map<string, string>();
+  const responseRecords = form.formSubmissions.map((submission) => {
+    if (submission.ipHash && !networkGroupLabels.has(submission.ipHash)) {
+      networkGroupLabels.set(submission.ipHash, `Network group ${networkGroupLabels.size + 1}`);
+    }
+
+    return {
+      id: submission.id,
+      content: submission.content,
+      createdAt: submission.createdAt.toISOString(),
+      networkGroup: submission.ipHash
+        ? networkGroupLabels.get(submission.ipHash) ?? "Network group"
+        : "Network unavailable",
+    };
+  });
 
   return (
     <main data-console className="console-page relative min-h-screen overflow-hidden">
@@ -207,6 +226,9 @@ export default async function FormResponsesPage({
             </p>
           </div>
         </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          {networkGroupLabels.size.toLocaleString()} anonymized network group{networkGroupLabels.size === 1 ? "" : "s"}. Raw IP addresses are never displayed.
+        </p>
 
         {form.formSubmissions.length > 0 && columns.length > 0 ? (
           <section className="mt-10">
@@ -246,7 +268,7 @@ export default async function FormResponsesPage({
 
                     {isChoice && insight.distribution.length > 0 ? (
                       <div className="mt-5 space-y-3">
-                        {insight.distribution.slice(0, 3).map((item) => (
+                        {insight.distribution.slice(0, 5).map((item) => (
                           <div key={item.label}>
                             <div className="mb-1 flex items-center justify-between gap-2 text-xs">
                               <span className="truncate text-muted-foreground">{item.label}</span>
@@ -260,8 +282,15 @@ export default async function FormResponsesPage({
                             </div>
                           </div>
                         ))}
-                        {insight.distribution.length > 3 ? (
-                          <p className="pt-1 text-[11px] text-muted-foreground">Showing the three most common choices.</p>
+                        {insight.distribution[0]?.count > 0 ? (
+                          <p className="pt-1 text-[11px] text-muted-foreground">
+                            Most selected: <span className="font-medium text-foreground">{insight.distribution[0].label}</span>
+                          </p>
+                        ) : (
+                          <p className="pt-1 text-[11px] text-muted-foreground">No selections recorded yet.</p>
+                        )}
+                        {insight.distribution.length > 5 ? (
+                          <p className="pt-1 text-[11px] text-muted-foreground">Showing the five most common choices.</p>
                         ) : null}
                       </div>
                     ) : isNumber && insight.average !== undefined ? (
@@ -298,11 +327,7 @@ export default async function FormResponsesPage({
         ) : (
           <ResponseViewer
             columns={columns.map(({ id, label }) => ({ id, label }))}
-            submissions={form.formSubmissions.map((submission) => ({
-              id: submission.id,
-              content: submission.content,
-              createdAt: submission.createdAt.toISOString(),
-            }))}
+            submissions={responseRecords}
           />
         )}
       </div>
