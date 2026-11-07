@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getFormResponses } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
 import ResponseViewer from "@/components/ResponseViewer";
+import PublicFormLinkActions from "@/components/PublicFormLinkActions";
 
 type ResponseColumn = {
   id: string;
@@ -147,19 +148,17 @@ export default async function FormResponsesPage({
 
   const columns = getResponseColumns(form.content);
   const insights = getResponseInsights(columns, form.formSubmissions);
-  const networkGroupLabels = new Map<string, string>();
+  const locationGroups = new Map<string, string>();
   const responseRecords = form.formSubmissions.map((submission) => {
-    if (submission.ipHash && !networkGroupLabels.has(submission.ipHash)) {
-      networkGroupLabels.set(submission.ipHash, `Network group ${networkGroupLabels.size + 1}`);
+    if (submission.locationLabel && !locationGroups.has(submission.locationLabel)) {
+      locationGroups.set(submission.locationLabel, submission.locationLabel);
     }
 
     return {
       id: submission.id,
       content: submission.content,
       createdAt: submission.createdAt.toISOString(),
-      networkGroup: submission.ipHash
-        ? networkGroupLabels.get(submission.ipHash) ?? "Network group"
-        : "Network unavailable",
+      locationGroup: submission.locationLabel ?? "Location unavailable",
     };
   });
 
@@ -199,6 +198,7 @@ export default async function FormResponsesPage({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+            {form.published ? <PublicFormLinkActions shareURL={form.shareURL} /> : null}
             <a
               href={`/api/forms/${form.id}/responses`}
               className={buttonVariants({ size: "sm", className: "rounded-lg" })}
@@ -234,7 +234,7 @@ export default async function FormResponsesPage({
           </div>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          {networkGroupLabels.size.toLocaleString()} anonymized network group{networkGroupLabels.size === 1 ? "" : "s"}. Raw IP addresses are never displayed.
+          {locationGroups.size.toLocaleString()} location group{locationGroups.size === 1 ? "" : "s"} detected from coarse provider metadata. Raw IP addresses are never displayed.
         </p>
 
         {form.formSubmissions.length > 0 && columns.length > 0 ? (
@@ -247,7 +247,7 @@ export default async function FormResponsesPage({
               <p className="text-xs text-muted-foreground">A compact view of how people answered.</p>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-4 columns-1 gap-3 md:columns-2 xl:columns-3">
               {insights.map((insight, index) => {
                 const maxCount = insight.distribution[0]?.count ?? 1;
                 const isChoice = ["Select", "Radio", "Checkbox"].includes(insight.type);
@@ -256,7 +256,7 @@ export default async function FormResponsesPage({
                 return (
                   <article
                     key={insight.id}
-                    className="rounded-2xl border border-border/60 bg-card/70 p-5 shadow-xs"
+                    className="mb-3 break-inside-avoid rounded-2xl border border-border/60 bg-card/70 p-5 shadow-xs"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

@@ -21,7 +21,7 @@ type ResponseRecord = {
   id: number;
   content: string;
   createdAt: string;
-  networkGroup: string;
+  locationGroup: string;
 };
 
 function parseResponse(content: string): Record<string, unknown> {
@@ -81,7 +81,7 @@ export default function ResponseViewer({
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-foreground">Response {responses.length - index}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {new Date(response.createdAt).toLocaleString()} · {answered} of {columns.length} answered · {response.networkGroup}
+                      {new Date(response.createdAt).toLocaleString()} · {answered} of {columns.length} answered · {response.locationGroup}
                     </p>
                   </div>
                 </div>

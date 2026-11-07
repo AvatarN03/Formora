@@ -41,6 +41,7 @@ model FormSubmission {
   submissionKeyHash  String?
   browserTokenHash   String?
   ipHash             String?
+  locationLabel      String?
 
   form Form @relation(fields: [formId], references: [id])
 

@@ -123,9 +123,11 @@ export const getFormResponses = async (id: string) => {
       content: string;
       visits: number;
       submissions: number;
+      shareURL: string;
+      published: boolean;
     }>
   >`
-    SELECT "id", "name", "content", "visits", "submissions"
+    SELECT "id", "name", "content", "visits", "submissions", "shareURL", "published"
     FROM "Form"
     WHERE "id" = ${formId} AND "userId" = ${userId}
     LIMIT 1
@@ -137,9 +139,9 @@ export const getFormResponses = async (id: string) => {
   }
 
   const formSubmissions = await prisma.$queryRaw<
-    Array<{ id: number; content: string; createdAt: Date; ipHash: string | null }>
+    Array<{ id: number; content: string; createdAt: Date; ipHash: string | null; locationLabel: string | null }>
   >`
-    SELECT "id", "content", "createdAt", "ipHash"
+    SELECT "id", "content", "createdAt", "ipHash", "locationLabel"
     FROM "FormSubmission"
     WHERE "formId" = ${form.id}
     ORDER BY "createdAt" DESC
@@ -555,6 +557,27 @@ function getClientIpHash(requestHeaders: Headers) {
     .digest("hex");
 }
 
+function getClientLocationLabel(requestHeaders: Headers) {
+  const readHeader = (...names: string[]) => {
+    for (const name of names) {
+      const value = requestHeaders.get(name)?.trim();
+      if (value) {
+        try {
+          return decodeURIComponent(value).replace(/[\r\n,]+/g, " ").slice(0, 80);
+        } catch {
+          return value.replace(/[\r\n,]+/g, " ").slice(0, 80);
+        }
+      }
+    }
+    return null;
+  };
+
+  const city = readHeader("x-vercel-ip-city", "cf-ipcity");
+  const region = readHeader("x-vercel-ip-country-region");
+  const country = readHeader("x-vercel-ip-country", "cf-ipcountry");
+  return [city, region, country].filter(Boolean).join(", ") || null;
+}
+
 const browserTokenCookieName = "formora_browser_token";
 
 function getBrowserTokenSecret() {
@@ -663,6 +686,7 @@ export const submitForm = async (
   const submissionKeyHash = hashSubmissionKey(submissionKey);
   const requestHeaders = await headers();
   const ipHash = getClientIpHash(requestHeaders);
+  const locationLabel = getClientLocationLabel(requestHeaders);
 
   const existingSubmission = await prisma.$queryRaw<Array<{ id: number }>>`
     SELECT "id"
@@ -700,10 +724,10 @@ export const submitForm = async (
     return await prisma.$transaction(async (tx) => {
       const submissions = await tx.$queryRaw<Array<{ id: number }>>`
         INSERT INTO "FormSubmission" (
-          "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash"
+          "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash", "locationLabel"
         )
         VALUES (
-          ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}
+          ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}, ${locationLabel}
         )
         RETURNING "id"
       `;
