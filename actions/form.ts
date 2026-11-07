@@ -676,13 +676,14 @@ export const submitForm = async (
 
   if (ipHash && form.rateLimitPerHour > 0) {
     const windowStart = new Date(Date.now() - 60 * 60 * 1000);
-    const recentSubmissions = await prisma.formSubmission.count({
-      where: {
-        formId: form.id,
-        ipHash,
-        createdAt: { gte: windowStart },
-      },
-    });
+    const recentCounts = await prisma.$queryRaw<Array<{ count: number | bigint }>>`
+      SELECT COUNT(*)::int AS "count"
+      FROM "FormSubmission"
+      WHERE "formId" = ${form.id}
+        AND "ipHash" = ${ipHash}
+        AND "createdAt" >= ${windowStart}
+    `;
+    const recentSubmissions = Number(recentCounts[0]?.count ?? 0);
 
     if (recentSubmissions >= form.rateLimitPerHour) {
       throw new Error("This form has reached its hourly response limit for your network. Please try again later.");
@@ -697,27 +698,37 @@ export const submitForm = async (
 
   try {
     return await prisma.$transaction(async (tx) => {
-      const submission = await tx.formSubmission.create({
-        data: {
-          formId: form.id,
-          content: validatedContent,
-          submissionKeyHash,
-          browserTokenHash,
-          ipHash,
-        },
-      });
+      const submissions = await tx.$queryRaw<Array<{ id: number }>>`
+        INSERT INTO "FormSubmission" (
+          "formId", "content", "submissionKeyHash", "browserTokenHash", "ipHash"
+        )
+        VALUES (
+          ${form.id}, ${validatedContent}, ${submissionKeyHash}, ${browserTokenHash}, ${ipHash}
+        )
+        RETURNING "id"
+      `;
 
-      await tx.form.update({
-        where: { id: form.id },
-        data: { submissions: { increment: 1 } },
-      });
+      await tx.$executeRaw`
+        UPDATE "Form"
+        SET "submissions" = "submissions" + 1
+        WHERE "id" = ${form.id}
+      `;
 
-      return { duplicate: false, submissionId: submission.id };
+      return { duplicate: false, submissionId: submissions[0].id };
     });
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
+    ) {
+      return { duplicate: true };
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "23505"
     ) {
       return { duplicate: true };
     }
