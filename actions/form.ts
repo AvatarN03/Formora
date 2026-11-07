@@ -111,6 +111,11 @@ export const getPublishedFormByShareURL = async (shareURL: string) => {
     throw new Error("Published form not found");
   }
 
+  await prisma.form.update({
+    where: { id: form.id },
+    data: { visits: { increment: 1 } },
+  });
+
   return form;
 };
 
@@ -201,4 +206,26 @@ export const publishForm = async (id: string, content: string) => {
   revalidatePath("/console");
 
   return form?.shareURL ?? "";
+};
+
+export const submitForm = async (shareURL: string, content: string) => {
+  const form = await prisma.form.findFirst({
+    where: { shareURL, published: true },
+  });
+
+  if (!form) {
+    throw new Error("Form not found");
+  }
+
+  return prisma.form.update({
+    where: { id: form.id },
+    data: {
+      submissions: { increment: 1 },
+      formSubmissions: {
+        create: {
+          content,
+        },
+      },
+    },
+  });
 };
