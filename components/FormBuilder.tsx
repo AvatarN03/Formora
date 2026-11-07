@@ -1,17 +1,16 @@
-"use client"
-import { useState } from "react";
-import type { Form } from "@prisma/client";
-import { ArrowLeft, Check, Pencil, X } from "lucide-react";
+"use client";
 
-import {  DragDropProvider } from "@dnd-kit/react";
+import { useCallback, useRef, useState } from "react";
+import type { Form } from "@prisma/client";
+import { ArrowLeft, Check, Eye, EyeOff, Pencil, X } from "lucide-react";
+import { DragDropProvider } from "@dnd-kit/react";
 
 import PreviewDialogBtn from "@/components/PreviewDialogBtn";
 import PublishFormBtn from "@/components/PublishFormBtn";
 import SaveFormBtn from "@/components/SaveFormBtn";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { updateFormName } from "@/actions/form";
-
+import { updateFormName, saveFormContent } from "@/actions/form";
 import Designer from "@/components/Designer";
 import DragOverlayWrapper from "@/components/DragOverlayWrapper";
 import {
@@ -19,6 +18,11 @@ import {
   type FormElementInstance,
 } from "@/components/FormElements";
 import FormPreview from "@/components/FormPreview";
+import {
+  UnsavedChangesDialog,
+  useUnsavedChangesGuard,
+} from "@/components/UnsavedChangesGuard";
+import { cn } from "cn";
 
 function readFormElements(content: string): FormElementInstance[] {
   const parsed: unknown = JSON.parse(content);
@@ -48,7 +52,38 @@ const FormBuilder = ({ form }: { form: Form }) => {
   const [isSavingName, setIsSavingName] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isPublished, setIsPublished] = useState(form.published);
-  const [elements, setElements] = useState<FormElementInstance[]>(() => readFormElements(form.content));
+
+  // Track "saved snapshot" to detect unsaved changes
+  const savedContentRef = useRef<string>(form.content);
+  const [elements, setElements] = useState<FormElementInstance[]>(() =>
+    readFormElements(form.content),
+  );
+
+  const currentContent = JSON.stringify(elements);
+  const hasUnsavedChanges =
+    !isPublished && currentContent !== savedContentRef.current;
+
+  /* ── Save helper (also used by unsaved-changes guard) ── */
+  const handleSave = useCallback(async () => {
+    await saveFormContent(String(form.id), currentContent);
+    savedContentRef.current = currentContent;
+  }, [form.id, currentContent]);
+
+  /* ── Unsaved changes guard ── */
+  const {
+    checkAndNavigate,
+    dialogOpen,
+    handleSaveAndNavigate,
+    handleDiscard,
+    handleCancel,
+    isSaving: isSavingGuard,
+  } = useUnsavedChangesGuard({
+    hasUnsavedChanges,
+    onSave: handleSave,
+    onDiscard: () => {
+      savedContentRef.current = currentContent; // mark clean so no double guard
+    },
+  });
 
   const saveFormName = async () => {
     const nextName = draftName.trim();
@@ -70,84 +105,171 @@ const FormBuilder = ({ form }: { form: Form }) => {
   };
 
   return (
-    <DragDropProvider
-      onDragEnd={(event) => {
-        console.log("Dragged element:", event);
-      }}
-    >
-        <main data-builder className="flex min-h-screen flex-col bg-[var(--builder-paper)] text-[var(--builder-ink)]">
-          <nav className="builder-topbar border-b border-[var(--builder-ink)] bg-[var(--builder-paper)] px-4 py-3 sm:px-6">
-            <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4">
+    <>
+      {/* Unsaved changes dialog — rendered outside DragDropProvider so it's always accessible */}
+      <UnsavedChangesDialog
+        open={dialogOpen}
+        isSaving={isSavingGuard}
+        onSave={() => void handleSaveAndNavigate()}
+        onDiscard={handleDiscard}
+        onCancel={handleCancel}
+      />
+
+      <DragDropProvider
+        onDragEnd={(event) => {
+          console.log("Dragged element:", event);
+        }}
+      >
+        <main data-builder className="flex min-h-screen flex-col bg-background text-foreground">
+          <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
+            <div className="mx-auto flex w-full max-w-[96rem] flex-wrap items-center justify-between gap-4 px-5 py-3 sm:px-6 lg:px-10">
+              {/* Left: Back Button (intercepted by guard) & Form Title */}
               <div className="flex min-w-0 items-center gap-3">
-                <a href="/console" className="builder-icon-button" aria-label="Back to workspace">
+                <button
+                  type="button"
+                  onClick={() => checkAndNavigate("/console")}
+                  className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-card/60 text-muted-foreground shadow-2xs transition-colors hover:border-border hover:bg-accent hover:text-foreground"
+                  aria-label="Back to workspace"
+                >
                   <ArrowLeft className="size-4" />
-                </a>
-                <span className="builder-signal hidden text-[10px] font-bold uppercase tracking-[0.2em] sm:inline">Builder / 01</span>
-                <span className="builder-muted">/</span>
-              {isEditingName ? (
-                <div className="flex min-w-0 items-center gap-2">
-                  <input
-                    autoFocus
-                    value={draftName}
-                    onChange={(event) => setDraftName(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") void saveFormName();
-                      if (event.key === "Escape") {
+                </button>
+
+                {isEditingName ? (
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <input
+                      autoFocus
+                      value={draftName}
+                      onChange={(event) => setDraftName(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") void saveFormName();
+                        if (event.key === "Escape") {
+                          setDraftName(formName);
+                          setIsEditingName(false);
+                        }
+                      }}
+                      className="h-9 w-48 rounded-lg border border-primary bg-background px-2.5 text-sm font-semibold text-foreground shadow-xs outline-none focus:ring-2 focus:ring-primary/20 sm:w-64"
+                      aria-label="Form name"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void saveFormName()}
+                      disabled={isSavingName}
+                      className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs hover:bg-primary/90 disabled:opacity-50"
+                      aria-label="Save form name"
+                    >
+                      <Check className="size-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         setDraftName(formName);
                         setIsEditingName(false);
-                      }
-                    }}
-                    className="h-9 w-full max-w-xs border-b-2 border-[var(--builder-signal)] bg-transparent px-1 text-base font-bold outline-none"
-                    aria-label="Form name"
+                      }}
+                      className="flex size-8 items-center justify-center rounded-lg border border-border/70 bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
+                      aria-label="Cancel editing form name"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingName(true)}
+                    className="group flex min-w-0 cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-muted/50"
+                    title="Click to rename"
+                  >
+                    <span className="truncate text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                      {formName}
+                    </span>
+                    <Pencil className="size-3.5 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground" />
+                  </button>
+                )}
+
+                {/* Unsaved dot indicator */}
+                {hasUnsavedChanges && (
+                  <span
+                    title="Unsaved changes"
+                    className="size-2 shrink-0 rounded-full bg-amber-500"
                   />
-                  <button type="button" onClick={() => void saveFormName()} disabled={isSavingName} className="builder-icon-button builder-signal disabled:cursor-not-allowed" aria-label="Save form name">
-                    <Check className="size-4" />
-                  </button>
-                  <button type="button" onClick={() => { setDraftName(formName); setIsEditingName(false); }} className="builder-icon-button builder-muted" aria-label="Cancel editing form name">
-                    <X className="size-4" />
-                  </button>
-                </div>
-              ) : (
-                <button type="button" onClick={() => setIsEditingName(true)} className="group flex min-w-0 cursor-pointer items-center gap-2 text-left" title="Edit form name">
-                  <span className="truncate text-lg font-bold tracking-[-0.03em]">{formName}</span>
-                  <Pencil className="size-3.5 shrink-0 builder-muted transition-colors group-hover:text-[var(--builder-signal)]" />
-                </button>
-              )}
+                )}
+
+                {/* Published / Draft badge */}
+                <span
+                  className={cn(
+                    "hidden items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-wide sm:inline-flex border",
+                    isPublished
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "border-border/70 bg-muted/40 text-muted-foreground",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full",
+                      isPublished
+                        ? "bg-emerald-500 animate-pulse"
+                        : "bg-muted-foreground/50",
+                    )}
+                  />
+                  {isPublished ? "Published" : "Draft"}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-              <span className="builder-muted mr-2 hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] md:flex">
-                <span className={`size-2 rounded-full ${isPublished ? "bg-[var(--builder-signal)]" : "bg-[var(--builder-ink)]/30"}`} />
-                {isPublished ? "Published" : "Draft"}
-              </span>
-              <ButtonGroup className="builder-button-group">
-                <PreviewDialogBtn onClick={() => setIsPreviewing((current) => !current)} />
-              {!isPublished && (
-                <SaveFormBtn formId={String(form.id)} elements={elements} />
-              )}
-              </ButtonGroup>
-              {!isPublished && (
-                <PublishFormBtn
-                  formId={String(form.id)}
-                  elements={elements}
-                  onPublished={() => setIsPublished(true)}
-                />
-              )}
-              <ThemeToggle />
+
+              {/* Right: Actions */}
+              <div className="flex items-center gap-2.5">
+                <ButtonGroup className="gap-2">
+                  <PreviewDialogBtn
+                    isPreviewing={isPreviewing}
+                    onClick={() => setIsPreviewing((current) => !current)}
+                  />
+                  {!isPublished && (
+                    <SaveFormBtn
+                      formId={String(form.id)}
+                      elements={elements}
+                      onSaved={() => {
+                        savedContentRef.current = currentContent;
+                      }}
+                    />
+                  )}
+                </ButtonGroup>
+
+                {!isPublished && (
+                  <PublishFormBtn
+                    formId={String(form.id)}
+                    elements={elements}
+                    onPublished={() => {
+                      savedContentRef.current = currentContent;
+                      setIsPublished(true);
+                    }}
+                  />
+                )}
+
+                <div className="h-5 w-px bg-border/60" />
+                <ThemeToggle />
               </div>
             </div>
           </nav>
-          <div className="builder-workspace relative flex min-h-150 w-full grow overflow-y-auto p-4 sm:p-6 lg:min-h-200 lg:p-8">
+
+          <div className="builder-workspace relative flex min-h-[calc(100vh-65px)] w-full grow overflow-y-auto p-4 sm:p-6 lg:p-8">
             {isPreviewing ? (
-              <FormPreview form={form} elements={elements} onBack={() => setIsPreviewing(false)} />
+              <FormPreview
+                form={form}
+                elements={elements}
+                onBack={() => setIsPreviewing(false)}
+              />
             ) : (
               <>
-                <Designer elements={elements} onElementsChange={setElements} />
+                <Designer
+                  formName={formName}
+                  elements={elements}
+                  onElementsChange={setElements}
+                />
                 <DragOverlayWrapper />
               </>
             )}
           </div>
         </main>
-    </DragDropProvider>
+      </DragDropProvider>
+    </>
   );
 };
 
