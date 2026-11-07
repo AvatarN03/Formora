@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   const name = user?.fullName ?? user?.firstName ?? "Account";
 
   return (
-    <div className="console-shell min-h-screen bg-background text-foreground selection:bg-primary/25 selection:text-foreground">
+    <div className="console-shell min-h-screen bg-background text-foreground">
       <DashboardHeader name={name} email={user?.primaryEmailAddress?.emailAddress} />
       {children}
     </div>

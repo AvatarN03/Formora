@@ -75,7 +75,7 @@ export default function Home() {
     <main
       ref={landingRef}
       data-landing
-      className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/20 selection:text-foreground"
+      className="min-h-screen bg-background font-sans text-foreground"
     >
       <MarketingHeader />
       <HeroSection />
