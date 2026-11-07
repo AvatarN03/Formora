@@ -111,26 +111,41 @@ export const getFormResponses = async (id: string) => {
     throw new Error("Unauthorized");
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id: Number(id), userId },
-    select: {
-      id: true,
-      name: true,
-      content: true,
-      visits: true,
-      submissions: true,
-      formSubmissions: {
-        orderBy: { createdAt: "desc" },
-        select: { id: true, content: true, createdAt: true, ipHash: true },
-      },
-    },
-  });
+  const formId = Number(id);
+  if (!Number.isInteger(formId) || formId < 1) {
+    throw new Error("Form not found");
+  }
+
+  const forms = await prisma.$queryRaw<
+    Array<{
+      id: number;
+      name: string;
+      content: string;
+      visits: number;
+      submissions: number;
+    }>
+  >`
+    SELECT "id", "name", "content", "visits", "submissions"
+    FROM "Form"
+    WHERE "id" = ${formId} AND "userId" = ${userId}
+    LIMIT 1
+  `;
+  const form = forms[0];
 
   if (!form) {
     throw new Error("Form not found");
   }
 
-  return form;
+  const formSubmissions = await prisma.$queryRaw<
+    Array<{ id: number; content: string; createdAt: Date; ipHash: string | null }>
+  >`
+    SELECT "id", "content", "createdAt", "ipHash"
+    FROM "FormSubmission"
+    WHERE "formId" = ${form.id}
+    ORDER BY "createdAt" DESC
+  `;
+
+  return { ...form, formSubmissions };
 };
 
 export const getPublishedFormByShareURL = async (shareURL: string) => {

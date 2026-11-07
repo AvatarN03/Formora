@@ -135,8 +135,15 @@ export default async function FormResponsesPage({
   if (!userId) redirect("/sign-in");
 
   const { id } = await params;
-  const form = await getFormResponses(id).catch(() => null);
-  if (!form) notFound();
+  let form;
+  try {
+    form = await getFormResponses(id);
+  } catch (error) {
+    if (error instanceof Error && error.message === "Form not found") {
+      notFound();
+    }
+    throw error;
+  }
 
   const columns = getResponseColumns(form.content);
   const insights = getResponseInsights(columns, form.formSubmissions);
