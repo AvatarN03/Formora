@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-
 import { auth } from "@clerk/nextjs/server";
 
 import { FormCollection, FormCollectionSkeleton } from "./_components/form-collection";
@@ -14,45 +13,70 @@ export default async function ConsolePage() {
   }
 
   return (
-    <main data-console className="console-page min-h-screen">
-      <div className="mx-auto max-w-[96rem] space-y-10 px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
-        <div className="flex flex-col gap-6 border-b border-border/50 pb-8 sm:flex-row sm:items-end sm:justify-between">
+    <main data-console className="console-page relative min-h-screen overflow-hidden">
+      {/* Subtle Ambient Warm Glows */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 -right-32 -z-10 size-[480px] rounded-full bg-gradient-to-br from-primary/[0.06] via-orange-400/[0.02] to-transparent blur-[130px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 -left-32 -z-10 size-[420px] rounded-full bg-gradient-to-tr from-primary/[0.04] via-orange-400/[0.02] to-transparent blur-[120px]"
+      />
+
+      <div className="mx-auto max-w-[96rem] space-y-12 px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
+        {/* Workspace Hero Header */}
+        <div className="flex flex-col gap-6 border-b border-border/40 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="mb-5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="h-0.5 w-10 bg-primary" />
-              <span>Workspace / Console</span>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card px-3 py-1 font-mono text-[11px] text-muted-foreground shadow-2xs">
+              <span className="size-1.5 rounded-full bg-primary" />
+              <span className="tracking-wider uppercase">Workspace Studio</span>
             </div>
-            <h1 className="max-w-[9ch] text-5xl font-bold uppercase leading-[0.9] tracking-[-0.06em] text-foreground sm:text-7xl">
-              Your forms, in focus.
+
+            <h1 className="text-4xl font-bold uppercase tracking-tight sm:text-6xl lg:text-7xl leading-[0.98] text-foreground">
+              Your forms, <br />
+              <span className="text-muted-foreground">in focus.</span>
             </h1>
-            <p className="mt-5 max-w-lg text-sm leading-6 text-muted-foreground sm:text-base">
-              A focused workspace for composing clear forms, collecting responses, and keeping every project moving.
+
+            <p className="mt-5 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
+              A tactile workspace for composing thoughtful forms, inspecting live responses, and keeping your pipeline moving.
             </p>
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
+            <span className="hidden font-mono text-[11px] uppercase tracking-wider text-muted-foreground sm:inline">
               {new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}
             </span>
             <CreateForm />
           </div>
         </div>
 
-        <div className="console-section-label">
-          <span>01</span>
-          <span>Workspace overview</span>
-        </div>
-        <Suspense fallback={<StatsCardsSkeleton />}>
-          <StatsCards userId={userId} />
-        </Suspense>
+        {/* Section 1: Overview */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono uppercase tracking-[0.14em] text-muted-foreground font-semibold">
+              Performance Overview
+            </h2>
+            <span className="text-[11px] font-mono text-muted-foreground/70">
+              Aggregated across all forms
+            </span>
+          </div>
+          <Suspense fallback={<StatsCardsSkeleton />}>
+            <StatsCards userId={userId} />
+          </Suspense>
+        </section>
 
-        <div className="console-section-label pt-2">
-          <span>02</span>
-          <span>Form collection</span>
-        </div>
-        <Suspense fallback={<FormCollectionSkeleton />}>
-          <FormCollection userId={userId} />
-        </Suspense>
+        {/* Section 2: Form Collection */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono uppercase tracking-[0.14em] text-muted-foreground font-semibold">
+              Forms Library
+            </h2>
+          </div>
+          <Suspense fallback={<FormCollectionSkeleton />}>
+            <FormCollection userId={userId} />
+          </Suspense>
+        </section>
       </div>
     </main>
   );
