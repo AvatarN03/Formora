@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { FormElementInstance } from "../FormElements";
 
 export function updateAttributes(
@@ -114,14 +115,12 @@ export function RequiredProperty({
         <span className="text-xs font-semibold text-foreground">Required field</span>
         <p className="text-[11px] text-muted-foreground">User cannot submit form without filling this</p>
       </div>
-      <input
-        type="checkbox"
+      <Checkbox
         id={`${element.id}-required`}
         checked={required}
-        onChange={(event) =>
-          updateAttributes(element, updateElement, { required: event.target.checked })
+        onCheckedChange={(checked) =>
+          updateAttributes(element, updateElement, { required: checked === true })
         }
-        className="size-4 cursor-pointer rounded border-border/70 text-primary accent-primary"
       />
     </div>
   );

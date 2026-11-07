@@ -1,9 +1,12 @@
 "use client";
 
 import type { Form } from "@prisma/client";
-import { ArrowLeft, CheckSquare, CircleDot, Hash, List } from "lucide-react";
+import { ArrowLeft, CheckSquare, CircleDot, Hash, List, Tag } from "lucide-react";
 
 import type { FormElementInstance } from "@/components/FormElements";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function readText(element: FormElementInstance, key: string, fallback: string) {
   const value = element.extraAttributes?.[key];
@@ -40,6 +43,21 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
           {readText(element, "text", "Add supporting text to your form.")}
         </p>
       );
+    case "Label":
+      return (
+        <div className="space-y-1">
+          <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Tag className="size-3.5 text-primary" />
+            <span>{readText(element, "text", "Label text")}</span>
+            {required ? <span className="text-primary">*</span> : null}
+          </span>
+          {element.extraAttributes?.helperText ? (
+            <p className="text-xs text-muted-foreground">
+              {readText(element, "helperText", "")}
+            </p>
+          ) : null}
+        </div>
+      );
     case "Separator":
       return <hr className="border-border/70" />;
     case "Spacer":
@@ -60,24 +78,38 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
           />
         </label>
       );
-    case "Select":
+    case "Select": {
+      const options = readOptions(element);
       return (
-        <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <span className="text-foreground">{label}</span>
-          <span className="flex items-center gap-2">
-            <List className="size-4 text-primary" />
-            <select
-              required={required}
-              className="h-10 min-w-0 flex-1 rounded-lg border border-border/70 bg-background px-3 text-sm font-normal text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Choose an option</option>
-              {readOptions(element).map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
-          </span>
-        </label>
+        <div className="space-y-2">
+          <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-foreground">{label}</span>
+            <span className="flex items-center gap-2">
+              <List className="size-4 text-primary" />
+              <Select defaultValue="">
+                <SelectTrigger className="h-10 min-w-0 flex-1 rounded-lg border-border/70 bg-background text-foreground">
+                  <SelectValue placeholder="Choose an option..." />
+                </SelectTrigger>
+                <SelectContent>
+                {options.map((option) => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+                </SelectContent>
+              </Select>
+            </span>
+          </label>
+          {/* Options preview pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+            {options.map((opt, idx) => (
+              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                {opt}
+              </span>
+            ))}
+          </div>
+        </div>
       );
+    }
     case "NumberField":
       return (
         <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -93,33 +125,82 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
           </span>
         </label>
       );
-    case "Checkbox":
+    case "Checkbox": {
+      const rawOptions = element.extraAttributes?.options;
+      const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
+      const options = hasOptions ? (rawOptions as string[]) : [];
+
+      if (hasOptions) {
+        return (
+          <fieldset className="grid gap-3 text-sm text-foreground">
+            <legend className="font-semibold text-foreground">
+              <CheckSquare className="mr-2 inline size-4 text-primary" />
+              {label}
+              {required ? <span className="ml-1 text-primary">*</span> : null}
+            </legend>
+            <div className="space-y-1.5 pl-6">
+              {options.map((option, idx) => (
+                <label key={idx} className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground">
+                  <Checkbox name={`preview-cb-${element.id}`} value={option} aria-label={option} />
+                  <span>{option}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+              <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+              {options.map((opt, idx) => (
+                <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                  {opt}
+                </span>
+              ))}
+            </div>
+            {element.extraAttributes?.helperText ? (
+              <p className="text-xs text-muted-foreground">{String(element.extraAttributes.helperText)}</p>
+            ) : null}
+          </fieldset>
+        );
+      }
+
       return (
-        <label className="flex items-center gap-2.5 text-sm font-medium text-foreground">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-foreground">
           <CheckSquare className="size-4 text-primary" />
-          <input
-            type="checkbox"
-            required={required}
-            className="size-4 rounded border-border/70 text-primary focus:ring-primary"
-          />
-          {label}
+          <Checkbox required={required} aria-label={label} />
+          <span>{label}</span>
+          {required ? <span className="text-primary">*</span> : null}
         </label>
       );
-    case "Radio":
+    }
+    case "Radio": {
+      const options = readOptions(element);
       return (
         <fieldset className="grid gap-3 text-sm text-foreground">
           <legend className="font-semibold text-foreground">
             <CircleDot className="mr-2 inline size-4 text-primary" />
             {label}
+            {required ? <span className="text-primary">*</span> : null}
           </legend>
-          {readOptions(element).map((option) => (
-            <label key={option} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-              <input type="radio" name={element.id} required={required} className="size-4 text-primary" />
-              {option}
-            </label>
-          ))}
+          <RadioGroup className="space-y-1.5 pl-6">
+            {options.map((option, idx) => (
+              <label key={idx} className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground">
+                <RadioGroupItem value={option} aria-label={option} />
+                <span>{option}</span>
+              </label>
+            ))}
+          </RadioGroup>
+          <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+            {options.map((opt, idx) => (
+              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                {opt}
+              </span>
+            ))}
+          </div>
+          {element.extraAttributes?.helperText ? (
+            <p className="text-xs text-muted-foreground">{String(element.extraAttributes.helperText)}</p>
+          ) : null}
         </fieldset>
       );
+    }
     case "TextField":
     default:
       return (

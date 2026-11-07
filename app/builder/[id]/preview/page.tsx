@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, CheckSquare, CircleDot, Hash, List } from "lucide-react";
+import { ArrowLeft, CheckSquare, CircleDot, Hash, List, Tag } from "lucide-react";
 
 import { getFormById } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
@@ -28,6 +28,19 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
       return <h2 className="text-xl font-semibold text-foreground">{readText(element, "text", "Section heading")}</h2>;
     case "Paragraph":
       return <p className="text-sm leading-6 text-muted-foreground">{readText(element, "text", "Add supporting text to your form.")}</p>;
+    case "Label":
+      return (
+        <div className="space-y-1">
+          <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Tag className="size-3.5 text-primary" />
+            <span>{readText(element, "text", "Label text")}</span>
+            {required ? <span className="text-primary">*</span> : null}
+          </span>
+          {element.extraAttributes?.helperText ? (
+            <p className="text-xs text-muted-foreground">{readText(element, "helperText", "")}</p>
+          ) : null}
+        </div>
+      );
     case "Separator":
       return <hr className="border-border" />;
     case "Spacer":
@@ -39,19 +52,31 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
           <input type="date" required={required} className="h-10 rounded-sm border border-border bg-background px-3 text-sm text-foreground" />
         </label>
       );
-    case "Select":
+    case "Select": {
+      const options = readOptions(element);
       return (
-        <label className="grid gap-2 text-sm font-medium text-foreground">
-          {label}
-          <span className="flex items-center gap-2">
-            <List className="size-4 text-primary" />
-            <select required={required} className="h-10 min-w-0 flex-1 rounded-sm border border-border bg-background px-3 text-sm font-normal text-foreground">
-              <option value="">Choose an option</option>
-              {readOptions(element).map((option) => <option key={option}>{option}</option>)}
-            </select>
-          </span>
-        </label>
+        <div className="space-y-2">
+          <label className="grid gap-2 text-sm font-medium text-foreground">
+            {label}
+            <span className="flex items-center gap-2">
+              <List className="size-4 text-primary" />
+              <select required={required} defaultValue="" className="h-10 min-w-0 flex-1 rounded-sm border border-border bg-background px-3 text-sm font-normal text-foreground">
+                <option value="" disabled>Choose an option...</option>
+                {options.map((option) => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </span>
+          </label>
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+            {options.map((opt, idx) => (
+              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                {opt}
+              </span>
+            ))}
+          </div>
+        </div>
       );
+    }
     case "NumberField":
       return (
         <label className="grid gap-2 text-sm font-medium text-foreground">
@@ -62,15 +87,76 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
           </span>
         </label>
       );
-    case "Checkbox":
-      return <label className="flex items-center gap-2 text-sm text-foreground"><CheckSquare className="size-4 text-primary" /><input type="checkbox" required={required} />{label}</label>;
-    case "Radio":
+    case "Checkbox": {
+      const rawOptions = element.extraAttributes?.options;
+      const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
+      const options = hasOptions ? (rawOptions as string[]) : [];
+
+      if (hasOptions) {
+        return (
+          <fieldset className="grid gap-3 text-sm text-foreground">
+            <legend className="font-medium">
+              <CheckSquare className="mr-2 inline size-4 text-primary" />
+              {label}
+              {required ? <span className="ml-1 text-primary">*</span> : null}
+            </legend>
+            <div className="space-y-1.5 pl-6">
+              {options.map((option, idx) => (
+                <label key={idx} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                  <input type="checkbox" name={`preview-cb-${element.id}`} value={option} className="size-4 text-primary accent-primary" />
+                  <span>{option}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+              <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+              {options.map((opt, idx) => (
+                <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                  {opt}
+                </span>
+              ))}
+            </div>
+          </fieldset>
+        );
+      }
+
+      return (
+        <label className="flex items-center gap-2 text-sm text-foreground">
+          <CheckSquare className="size-4 text-primary" />
+          <input type="checkbox" required={required} className="size-4 text-primary accent-primary" />
+          <span>{label}</span>
+          {required ? <span className="text-primary">*</span> : null}
+        </label>
+      );
+    }
+    case "Radio": {
+      const options = readOptions(element);
       return (
         <fieldset className="grid gap-3 text-sm text-foreground">
-          <legend className="font-medium"><CircleDot className="mr-2 inline size-4 text-primary" />{label}</legend>
-          {readOptions(element).map((option) => <label key={option} className="flex items-center gap-2"><input type="radio" name={element.id} required={required} />{option}</label>)}
+          <legend className="font-medium">
+            <CircleDot className="mr-2 inline size-4 text-primary" />
+            {label}
+            {required ? <span className="text-primary">*</span> : null}
+          </legend>
+          <div className="space-y-1.5 pl-6">
+            {options.map((option, idx) => (
+              <label key={idx} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <input type="radio" name={element.id} value={option} required={required} className="size-4 text-primary accent-primary" />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
+            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+            {options.map((opt, idx) => (
+              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                {opt}
+              </span>
+            ))}
+          </div>
         </fieldset>
       );
+    }
     case "TextField":
     default:
       return (

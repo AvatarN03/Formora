@@ -34,7 +34,10 @@ export const TextFieldFormElement: FormElement = {
                 <span>{String(element.extraAttributes?.label ?? "Text Field")}</span>
                 {element.extraAttributes?.required ? <span className="text-primary">*</span> : null}
             </div>
-            <Input placeholder={String(element.extraAttributes?.placeholder ?? "Enter text")} disabled className="rounded-lg border-border/70 bg-background/50" />
+            <Input
+                placeholder={String(element.extraAttributes?.placeholder ?? "Enter text")}
+                className="cursor-text rounded-lg border-border/70 bg-background/50 text-foreground"
+            />
             {element.extraAttributes?.helperText ? (
                 <p className="mt-2 text-xs text-muted-foreground">{String(element.extraAttributes.helperText)}</p>
             ) : null}

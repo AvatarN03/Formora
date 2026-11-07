@@ -9,9 +9,19 @@ import {
   Minus,
   MoveVertical,
   Pilcrow,
+  Tag,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { FormElement, FormElementInstance } from "../FormElements";
 import {
   OptionsProperty,
@@ -53,6 +63,56 @@ export const ParagraphFormElement: FormElement = {
     </PropertiesGroup>
   ),
   formComponent: () => <p>Add supporting text to your form.</p>,
+};
+
+export const LabelFormElement: FormElement = {
+  type: "Label",
+  constuct: (id) => ({
+    id,
+    type: "Label",
+    extraAttributes: {
+      text: "Label Text",
+      helperText: "",
+      required: false,
+    },
+  }),
+  designerBtn: { icon: Tag, label: "Label" },
+  designerComponent: ({ element }) => {
+    const text = String(element.extraAttributes?.text ?? "Label Text");
+    const helperText = String(element.extraAttributes?.helperText ?? "");
+    const required = Boolean(element.extraAttributes?.required);
+
+    return (
+      <div className="w-full rounded-xl border border-border/70 bg-card/90 p-4 shadow-2xs">
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <Tag className="size-4 text-primary" />
+          <span>{text}</span>
+          {required ? <span className="text-primary">*</span> : null}
+        </div>
+        {helperText ? (
+          <p className="mt-1 text-xs text-muted-foreground">{helperText}</p>
+        ) : null}
+      </div>
+    );
+  },
+  propertiesComponent: ({ element, updateElement }) => (
+    <PropertiesGroup>
+      <TextProperty
+        element={element}
+        updateElement={updateElement!}
+        name="text"
+        label="Label text"
+      />
+      <TextProperty
+        element={element}
+        updateElement={updateElement!}
+        name="helperText"
+        label="Helper text / Description (optional)"
+      />
+      <RequiredProperty element={element} updateElement={updateElement!} />
+    </PropertiesGroup>
+  ),
+  formComponent: () => <label>Label Text</label>,
 };
 
 export const SeparatorFormElement: FormElement = {
@@ -140,9 +200,9 @@ export const DatePickerFormElement: FormElement = {
           {required ? <span className="text-primary">*</span> : null}
         </div>
         <Input
+          type="date"
           placeholder="Pick a date"
-          disabled
-          className="rounded-lg border-border/70 bg-background/50"
+          className="cursor-pointer rounded-lg border-border/70 bg-background/50 text-foreground"
         />
         {helperText ? (
           <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
@@ -196,10 +256,38 @@ export const SelectFormElement: FormElement = {
           <span>{label}</span>
           {required ? <span className="text-primary">*</span> : null}
         </div>
-        <div className="flex h-9 items-center justify-between rounded-lg border border-border/70 bg-background/50 px-3 text-xs text-muted-foreground">
-          <span>Choose an option ({options.length} available)</span>
-          <span className="text-[10px]">▼</span>
+
+        {/* Real interactive select dropdown */}
+        <div className="relative">
+          <Select defaultValue="">
+            <SelectTrigger className="h-10 w-full rounded-lg border-border/70 bg-background/60 text-foreground">
+              <SelectValue placeholder={`Choose an option (${options.length} available)...`} />
+            </SelectTrigger>
+            <SelectContent>
+            {options.map((option, idx) => (
+              <SelectItem key={`${idx}-${option}`} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Options Preview Pills / Badges */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            Options preview:
+          </span>
+          {options.map((option, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-md border border-border/70 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-foreground shadow-2xs"
+            >
+              {option}
+            </span>
+          ))}
+        </div>
+
         {helperText ? (
           <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
         ) : null}
@@ -258,8 +346,7 @@ export const NumberFieldFormElement: FormElement = {
         <Input
           type="number"
           placeholder={placeholder}
-          disabled
-          className="rounded-lg border-border/70 bg-background/50"
+          className="cursor-text rounded-lg border-border/70 bg-background/50 text-foreground"
         />
         {helperText ? (
           <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
@@ -299,32 +386,64 @@ export const CheckboxFormElement: FormElement = {
     id,
     type: "Checkbox",
     extraAttributes: {
-      label: "I agree to the terms and conditions",
-      helperText: "",
+      label: "Checkbox Options",
+      helperText: "Select one or more",
       required: false,
+      options: ["Option 1", "Option 2"],
     },
   }),
   designerBtn: { icon: CheckSquare, label: "Checkbox" },
   designerComponent: ({ element }) => {
     const label = String(
-      element.extraAttributes?.label ??
-        "I agree to the terms and conditions",
+      element.extraAttributes?.label ?? "Checkbox Options",
     );
     const helperText = String(element.extraAttributes?.helperText ?? "");
     const required = Boolean(element.extraAttributes?.required);
+    const rawOptions = element.extraAttributes?.options;
+    const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
+    const options = hasOptions ? (rawOptions as string[]) : [];
 
     return (
       <div className="w-full rounded-xl border border-border/70 bg-card/90 p-4 shadow-2xs">
-        <div className="flex items-center gap-2.5 text-sm font-medium text-foreground">
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
           <CheckSquare className="size-4 text-primary" />
-          <input
-            type="checkbox"
-            disabled
-            className="size-4 rounded border-border/70"
-          />
           <span>{label}</span>
           {required ? <span className="text-primary">*</span> : null}
         </div>
+
+        {hasOptions ? (
+          <div className="space-y-1.5 pl-6">
+            {options.map((option, idx) => (
+              <label
+                key={idx}
+                className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1 text-sm text-foreground transition-colors hover:bg-muted/40"
+              >
+                <Checkbox name={`checkbox-designer-${element.id}`} aria-label={option} />
+                <span>{option}</span>
+              </label>
+            ))}
+            {/* Options Preview Badges */}
+            <div className="mt-2 flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-[11px] font-medium text-muted-foreground">
+                Options preview:
+              </span>
+              {options.map((option, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center rounded-md border border-border/70 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-foreground shadow-2xs"
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <label className="flex cursor-pointer items-center gap-2.5 pl-6 text-sm font-medium text-foreground">
+            <Checkbox aria-label={label} />
+            <span>{label}</span>
+          </label>
+        )}
+
         {helperText ? (
           <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
         ) : null}
@@ -346,6 +465,7 @@ export const CheckboxFormElement: FormElement = {
         label="Helper text"
       />
       <RequiredProperty element={element} updateElement={updateElement!} />
+      <OptionsProperty element={element} updateElement={updateElement!} />
     </PropertiesGroup>
   ),
   formComponent: () => <input type="checkbox" />,
@@ -379,21 +499,33 @@ export const RadioFormElement: FormElement = {
           <span>{label}</span>
           {required ? <span className="text-primary">*</span> : null}
         </div>
-        <div className="space-y-1.5 pl-6">
+        <RadioGroup className="space-y-1.5 pl-6">
           {options.map((option, idx) => (
             <label
               key={idx}
-              className="flex items-center gap-2 text-xs text-muted-foreground"
+              className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1 text-sm text-foreground transition-colors hover:bg-muted/40"
             >
-              <input
-                type="radio"
-                disabled
-                className="size-3.5 text-primary"
-              />
+              <RadioGroupItem value={option} aria-label={option} />
               <span>{option}</span>
             </label>
           ))}
+        </RadioGroup>
+
+        {/* Options Preview Badges */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-6">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            Options preview:
+          </span>
+          {options.map((option, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-md border border-border/70 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-foreground shadow-2xs"
+            >
+              {option}
+            </span>
+          ))}
         </div>
+
         {helperText ? (
           <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
         ) : null}

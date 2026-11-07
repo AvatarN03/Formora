@@ -4,6 +4,7 @@ import { H1FormElement, H2FormElement } from "./fields/Heading"
 import {
     CheckboxFormElement,
     DatePickerFormElement,
+    LabelFormElement,
     NumberFieldFormElement,
     ParagraphFormElement,
     RadioFormElement,
@@ -18,6 +19,7 @@ export type ElementsType =
     | "H1"
     | "H2"
     | "Paragraph"
+    | "Label"
     | "Separator"
     | "Spacer"
     | "DatePicker"
@@ -61,6 +63,7 @@ export const FormElements: FormElementType = {
     H1: H1FormElement,
     H2: H2FormElement,
     Paragraph: ParagraphFormElement,
+    Label: LabelFormElement,
     Separator: SeparatorFormElement,
     Spacer: SpacerFormElement,
     DatePicker: DatePickerFormElement,
@@ -73,6 +76,7 @@ export const FormElements: FormElementType = {
 export const LayoutElements: FormElement[] = [
     FormElements.H1,
     FormElements.H2,
+    FormElements.Label,
     FormElements.Paragraph,
     FormElements.Separator,
     FormElements.Spacer,
