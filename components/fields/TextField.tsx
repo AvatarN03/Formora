@@ -28,12 +28,13 @@ export const TextFieldFormElement: FormElement = {
     },
 
     designerComponent: ({ element }) => (
-        <div className="w-full rounded-md border border-border/60 bg-card p-4 shadow-xs">
+        <div className="w-full rounded-xl border border-border/70 bg-card/90 p-4 shadow-2xs">
             <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                 <Text className="size-4 text-primary" />
                 <span>{String(element.extraAttributes?.label ?? "Text Field")}</span>
+                {element.extraAttributes?.required ? <span className="text-primary">*</span> : null}
             </div>
-            <Input placeholder={String(element.extraAttributes?.placeholder ?? "Enter text")} disabled />
+            <Input placeholder={String(element.extraAttributes?.placeholder ?? "Enter text")} disabled className="rounded-lg border-border/70 bg-background/50" />
             {element.extraAttributes?.helperText ? (
                 <p className="mt-2 text-xs text-muted-foreground">{String(element.extraAttributes.helperText)}</p>
             ) : null}

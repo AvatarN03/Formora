@@ -14,7 +14,7 @@ export const H1FormElement: FormElement = {
     label: "Heading 1",
   },
   designerComponent: ({ element }) => (
-    <div className="w-full rounded-md border border-border/60 bg-card p-4 shadow-xs">
+    <div className="w-full rounded-xl border border-border/70 bg-card/90 p-4 shadow-2xs">
       <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         <Heading1 className="size-5 text-primary" />
         {String(element.extraAttributes?.text ?? "Heading 1")}
@@ -37,7 +37,7 @@ export const H2FormElement: FormElement = {
     label: "Heading 2",
   },
   designerComponent: ({ element }) => (
-    <div className="w-full rounded-md border border-border/60 bg-card p-4 shadow-xs">
+    <div className="w-full rounded-xl border border-border/70 bg-card/90 p-4 shadow-2xs">
       <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
         <Heading2 className="size-5 text-primary" />
         {String(element.extraAttributes?.text ?? "Heading 2")}
