@@ -10,7 +10,7 @@ export function HeroSection() {
   const { isSignedIn } = useUser();
 
   return (
-    <section className="landing-reveal relative mx-auto max-w-7xl px-5 pt-12 pb-10 sm:px-6 lg:px-10 lg:pt-20 lg:pb-16 overflow-hidden">
+    <section className="landing-reveal relative mx-auto max-w-7xl px-5 pt-8 pb-10 sm:px-6 lg:px-10 lg:pt-10 lg:pb-16 overflow-hidden">
       {/* Subtle Ambient Warm Aura */}
       <div
         aria-hidden="true"
