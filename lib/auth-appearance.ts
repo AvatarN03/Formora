@@ -21,9 +21,13 @@ export function useAuthAppearance() {
       borderRadius: "0.625rem",
     },
     elements: {
-      rootBox: "w-full",
-      cardBox: "!rounded-2xl !border-0 !shadow-none !bg-transparent w-full",
-      card: "!rounded-2xl !border-0 !shadow-none !bg-transparent w-full p-0",
+      rootBox: "auth-clerk-root w-full max-w-full",
+      cardBox:
+        "auth-clerk-card-box !rounded-2xl !border-0 !shadow-none !bg-transparent !w-full !max-w-full",
+      card:
+        "auth-clerk-card !rounded-2xl !border-0 !shadow-none !bg-transparent !w-full !max-w-full !p-0 !m-0",
+      main: "w-full max-w-full",
+      form: "w-full max-w-full",
       headerTitle: "!text-2xl !font-bold !tracking-tight !text-foreground",
       headerSubtitle: "!text-xs !text-muted-foreground !mt-1 font-medium",
       formFieldLabel: "!text-xs !font-semibold !text-foreground",
@@ -36,6 +40,8 @@ export function useAuthAppearance() {
       socialButtonsBlockButtonText: "!text-foreground !font-medium",
       footerActionLink: "!text-primary hover:underline font-semibold text-xs",
       footerActionText: "!text-muted-foreground text-xs font-normal",
+      footer: "w-full max-w-full !mt-6",
+      footerAction: "w-full max-w-full",
       identityPreviewEditButton: "!text-primary hover:underline font-medium",
       identityPreviewText: "!text-foreground font-medium",
       formFieldInputShowPasswordButton: "!text-muted-foreground hover:!text-foreground",
@@ -46,4 +52,3 @@ export function useAuthAppearance() {
     },
   };
 }
-

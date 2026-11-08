@@ -468,14 +468,40 @@ button:disabled {
 
 .auth-clerk-root {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   background: transparent;
   border: 0 !important;
   box-shadow: none !important;
 }
 
+.auth-clerk-card-box,
+.auth-clerk-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.auth-clerk-card {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .auth-clerk-title,
 .auth-clerk-label {
   color: var(--foreground);
+}
+
+.auth-clerk-card *,
+.auth-clerk-card-box *,
+.auth-clerk-root * {
+  box-sizing: border-box;
+}
+
+.auth-clerk-card [class*="footer"],
+.auth-clerk-card [class*="Footer"] {
+  max-width: 100%;
+  min-width: 0;
 }
 
 .auth-clerk-subtitle {

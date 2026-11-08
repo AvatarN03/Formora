@@ -83,11 +83,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Right Column: Clerk Form Card Shell */}
-        <div className="auth-card-wrap w-full max-w-md rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs">
+        <div className="auth-card-wrap w-full max-w-md min-w-0 rounded-2xl border border-border/60 bg-card p-5 sm:p-8 shadow-xs">
           {children}
         </div>
       </div>
     </main>
   );
 }
-
