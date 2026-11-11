@@ -14,19 +14,19 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   const isSignIn = !pathname.includes("/sign-up");
 
   return (
-    <main className="auth-scene relative isolate flex min-h-screen items-center justify-center overflow-hidden px-5 py-24 sm:px-6 lg:px-10">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-24 text-foreground scheme-light dark:scheme-dark sm:px-6 lg:px-10">
       {/* Subtle Ambient Warm Auras */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -left-32 -z-10 size-[450px] rounded-full bg-gradient-to-br from-primary/[0.07] via-orange-400/[0.03] to-transparent blur-[130px]"
+        className="pointer-events-none absolute -top-32 -left-32 -z-10 size-[450px] rounded-full bg-linear-to-br from-primary/[0.07] via-orange-400/[0.03] to-transparent blur-[130px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-32 -right-32 -z-10 size-[450px] rounded-full bg-gradient-to-tl from-primary/[0.05] via-orange-400/[0.02] to-transparent blur-[130px]"
+        className="pointer-events-none absolute -bottom-32 -right-32 -z-10 size-[450px] rounded-full bg-linear-to-tl from-primary/[0.05] via-orange-400/[0.02] to-transparent blur-[130px]"
       />
 
       {/* Modern Top Header - matching landing navbar width */}
-      <header className="auth-header absolute inset-x-0 top-0 z-20 border-b">
+      <header className="absolute inset-x-0 top-0 z-20 border-b border-border bg-background/88 backdrop-blur-[14px]">
         <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative flex size-8 items-center justify-center">
@@ -83,7 +83,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Right Column: Clerk Form Card Shell */}
-        <div className="auth-card-wrap w-full max-w-md min-w-0 rounded-2xl border border-border/60 bg-card p-5 sm:p-8 shadow-xs">
+        <div className="w-full max-w-md min-w-0 rounded-2xl border border-border/60 bg-card p-5 shadow-xs sm:p-8">
           {children}
         </div>
       </div>

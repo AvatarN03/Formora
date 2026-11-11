@@ -397,63 +397,6 @@ button:disabled {
   }
 }
 
-.auth-scene {
-  --background: #f7f4ed;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #e33b2f;
-  --primary-foreground: #ffffff;
-  --secondary: #eee9e0;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f0ebe2;
-  --muted-foreground: #4a453e;
-  --accent: #e33b2f;
-  --accent-foreground: #ffffff;
-  --border: #e2dcd2;
-  --input: #d1cbc0;
-  --ring: #e33b2f;
-  color-scheme: light;
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-.dark .auth-scene {
-  --background: #111317;
-  --foreground: #f2efe9;
-  --card: #181b22;
-  --card-foreground: #f2efe9;
-  --popover: #181b22;
-  --popover-foreground: #f2efe9;
-  --primary: #ff6b52;
-  --primary-foreground: #111317;
-  --secondary: #222630;
-  --secondary-foreground: #f2efe9;
-  --muted: #1e222a;
-  --muted-foreground: #a6a096;
-  --accent: #ff6b52;
-  --accent-foreground: #111317;
-  --border: #262a34;
-  --input: #3b404d;
-  --ring: #ff6b52;
-  color-scheme: dark;
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-.auth-header {
-  border-color: var(--border);
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  backdrop-filter: blur(14px);
-}
-
-.auth-card-wrap {
-  border: 1px solid var(--border);
-  background: var(--card);
-}
-
 .auth-clerk-card {
   width: 100%;
   background: transparent;
