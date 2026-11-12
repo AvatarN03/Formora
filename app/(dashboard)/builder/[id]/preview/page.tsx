@@ -17,6 +17,24 @@ function readOptions(element: FormElementInstance) {
     : ["Option one", "Option two"];
 }
 
+function readCheckboxOptions(element: FormElementInstance) {
+  const value = element.extraAttributes?.options;
+  return Array.isArray(value) && value.every((option) => typeof option === "string") ? value : [];
+}
+
+function OptionSummary({ options }: { options: string[] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+      <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
+      {options.map((option, index) => (
+        <span key={`${option}-${index}`} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
+          {option}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function PreviewElement({ element }: { element: FormElementInstance }) {
   const label = readText(element, "label", "Untitled field");
   const required = Boolean(element.extraAttributes?.required);
@@ -62,18 +80,11 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
               <List className="size-4 text-primary" />
               <select required={required} defaultValue="" className="h-10 min-w-0 flex-1 rounded-sm border border-border bg-background px-3 text-sm font-normal text-foreground">
                 <option value="" disabled>Choose an option...</option>
-                {options.map((option) => <option key={option} value={option}>{option}</option>)}
+                {options.map((option, index) => <option key={`${option}-${index}`} value={option}>{option}</option>)}
               </select>
             </span>
           </label>
-          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
-            {options.map((opt, idx) => (
-              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
-                {opt}
-              </span>
-            ))}
-          </div>
+          <OptionSummary options={options} />
         </div>
       );
     }
@@ -88,9 +99,8 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
         </label>
       );
     case "Checkbox": {
-      const rawOptions = element.extraAttributes?.options;
-      const hasOptions = Array.isArray(rawOptions) && rawOptions.length > 0;
-      const options = hasOptions ? (rawOptions as string[]) : [];
+      const options = readCheckboxOptions(element);
+      const hasOptions = options.length > 0;
 
       if (hasOptions) {
         return (
@@ -101,20 +111,15 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
               {required ? <span className="ml-1 text-primary">*</span> : null}
             </legend>
             <div className="space-y-1.5 pl-6">
-              {options.map((option, idx) => (
-                <label key={idx} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              {options.map((option, index) => (
+                <label key={`${option}-${index}`} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
                   <input type="checkbox" name={`preview-cb-${element.id}`} value={option} className="size-4 text-primary accent-primary" />
                   <span>{option}</span>
                 </label>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
-              <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
-              {options.map((opt, idx) => (
-                <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
-                  {opt}
-                </span>
-              ))}
+            <div className="pl-6">
+              <OptionSummary options={options} />
             </div>
           </fieldset>
         );
@@ -139,20 +144,15 @@ function PreviewElement({ element }: { element: FormElementInstance }) {
             {required ? <span className="text-primary">*</span> : null}
           </legend>
           <div className="space-y-1.5 pl-6">
-            {options.map((option, idx) => (
-              <label key={idx} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            {options.map((option, index) => (
+                <label key={`${option}-${index}`} className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
                 <input type="radio" name={element.id} value={option} required={required} className="size-4 text-primary accent-primary" />
                 <span>{option}</span>
               </label>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 pl-6 pt-0.5">
-            <span className="text-[11px] font-medium text-muted-foreground">Options:</span>
-            {options.map((opt, idx) => (
-              <span key={idx} className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-foreground">
-                {opt}
-              </span>
-            ))}
+          <div className="pl-6">
+            <OptionSummary options={options} />
           </div>
         </fieldset>
       );
