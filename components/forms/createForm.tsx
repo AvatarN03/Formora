@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import {
   Dialog,
@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Form,
   FormControl,
@@ -135,7 +136,7 @@ export default function CreateForm() {
               >
                 {form.formState.isSubmitting ? (
                   <>
-                    <Save className="mr-2 h-4 w-4 animate-pulse" />
+                    <Spinner className="mr-2 size-4" />
                     <span>Creating form...</span>
                   </>
                 ) : (
