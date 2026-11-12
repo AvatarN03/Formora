@@ -7,7 +7,9 @@ import { getSubmissionStatus, submitForm } from "@/actions/form";
 import type { FormElementInstance } from "@/components/builder/FormElements";
 import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { ThemeLogo } from "@/components/custom/theme-logo";
+import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -34,6 +36,22 @@ function readOptions(element: FormElementInstance): string[] {
         .filter(Boolean)
     : [];
   return options.length > 0 ? options : ["Option 1", "Option 2"];
+}
+
+function parseDateValue(value: unknown) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+    ? date
+    : undefined;
+}
+
+function formatDateValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function FormoraFooter() {
@@ -300,22 +318,30 @@ export default function FormSubmitComponent({
                     aria-hidden="true"
                   />
                 );
-              case "DatePicker":
+              case "DatePicker": {
+                const selectedDate = parseDateValue(formValues[element.id]);
                 return (
                   <div key={element.id} className="space-y-1.5">
                     <label className="text-sm font-medium text-foreground">
                       {label}
                       {required ? <span className="ml-1 text-primary">*</span> : null}
                     </label>
-                    <input
-                      type="date"
-                      value={String(formValues[element.id] ?? "")}
-                      onChange={(e) => handleInputChange(element.id, e.target.value)}
-                      className="h-10 w-full rounded-lg border border-border/70 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
+                    <Popover>
+                      <PopoverTrigger className="flex h-10 w-full items-center justify-start rounded-lg border border-border/70 bg-background px-3 text-left text-sm text-foreground outline-none transition-colors hover:bg-muted/40 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                        {selectedDate ? selectedDate.toLocaleDateString() : "Pick a date"}
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => handleInputChange(element.id, date ? formatDateValue(date) : "")}
+                        />
+                      </PopoverContent>
+                    </Popover>
                     {error ? <p className="text-xs text-destructive">{error}</p> : null}
                   </div>
                 );
+              }
               case "Select": {
                 const options = readOptions(element);
                 return (
