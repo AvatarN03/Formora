@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import { getFormResponses } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import ResponseViewer from "@/components/forms/responses/ResponseViewer";
 import PublicFormLinkActions from "@/components/forms/actions/PublicFormLinkActions";
 import ResponsePageRefresh from "@/components/forms/responses/ResponsePageRefresh";
@@ -292,12 +293,11 @@ export default async function FormResponsesPage({
                               <span className="truncate text-muted-foreground">{item.label}</span>
                               <span className="font-mono text-[10px] text-foreground">{item.count}</span>
                             </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                              <div
-                                className="h-full rounded-full bg-primary transition-all"
-                                style={{ width: `${Math.max(8, (item.count / maxCount) * 100)}%` }}
-                              />
-                            </div>
+                            <Progress
+                              value={Math.max(8, (item.count / maxCount) * 100)}
+                              aria-label={`${item.label} selections`}
+                              className="gap-0 [&_[data-slot=progress-track]]:h-1.5"
+                            />
                           </div>
                         ))}
                         {insight.distribution[0]?.count > 0 ? (
