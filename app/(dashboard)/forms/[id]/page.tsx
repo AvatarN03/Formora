@@ -5,9 +5,9 @@ import { auth } from "@clerk/nextjs/server";
 
 import { getFormResponses } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
-import ResponseViewer from "@/components/ResponseViewer";
-import PublicFormLinkActions from "@/components/PublicFormLinkActions";
-import ResponsePageRefresh from "@/components/ResponsePageRefresh";
+import ResponseViewer from "@/components/forms/responses/ResponseViewer";
+import PublicFormLinkActions from "@/components/forms/actions/PublicFormLinkActions";
+import ResponsePageRefresh from "@/components/forms/responses/ResponsePageRefresh";
 
 type ResponseColumn = {
   id: string;

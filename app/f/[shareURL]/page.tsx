@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { getPublishedFormByShareURL } from "@/actions/form";
-import FormSubmitComponent from "@/components/FormSubmitComponent";
-import type { FormElementInstance } from "@/components/FormElements";
+import FormSubmitComponent from "@/components/forms/public/FormSubmitComponent";
+import type { FormElementInstance } from "@/components/builder/FormElements";
 
 function parseContent(content: string): FormElementInstance[] {
   try {

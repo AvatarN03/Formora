@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { ThemeLogo } from "@/components/theme-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { HeroInteractiveCanvas } from "@/components/hero-interactive-canvas";
+import { HeroInteractiveCanvas } from "@/components/marketing/hero-interactive-canvas";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -18,16 +18,16 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       {/* Subtle Ambient Warm Auras */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -left-32 -z-10 size-[450px] rounded-full bg-linear-to-br from-primary/[0.07] via-orange-400/[0.03] to-transparent blur-[130px]"
+        className="pointer-events-none absolute -top-32 -left-32 -z-10 size-112.5 rounded-full bg-linear-to-br from-primary/7 via-orange-400/3 to-transparent blur-[130px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-32 -right-32 -z-10 size-[450px] rounded-full bg-linear-to-tl from-primary/[0.05] via-orange-400/[0.02] to-transparent blur-[130px]"
+        className="pointer-events-none absolute -bottom-32 -right-32 -z-10 size-112.5 rounded-full bg-linear-to-tl from-primary/5 via-orange-400/2 to-transparent blur-[130px]"
       />
 
       {/* Modern Top Header - matching landing navbar width */}
       <header className="absolute inset-x-0 top-0 z-20 border-b border-border bg-background/88 backdrop-blur-[14px]">
-        <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
+        <div className="mx-auto flex w-full max-w-384 items-center justify-between px-5 py-3.5 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative flex size-8 items-center justify-center">
               <ThemeLogo />
@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="size-3.5" />
               <span>Back to home</span>

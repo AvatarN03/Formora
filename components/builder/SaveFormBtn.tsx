@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { saveFormContent } from "@/actions/form";
-import type { FormElementInstance } from "@/components/FormElements";
+import type { FormElementInstance } from "@/components/builder/FormElements";
 import { toast } from "@/components/ui/toast";
 
 export default function SaveFormBtn({

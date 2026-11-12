@@ -21,7 +21,7 @@ import {
   LayoutElements,
   type ElementsType,
   type FormElementInstance,
-} from "@/components/FormElements";
+} from "@/components/builder/FormElements";
 
 import DesignerDropZone from "./DesignerDropZone";
 import DesignerSidebar from "./DesignerSidebar";

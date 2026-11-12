@@ -3,7 +3,7 @@
 import { DragOverlay, useDragOperation } from "@dnd-kit/react";
 import { cn } from "cn";
 
-import { FormElements, type ElementsType } from "@/components/FormElements";
+import { FormElements, type ElementsType } from "@/components/builder/FormElements";
 
 export default function DragOverlayWrapper() {
   const { source } = useDragOperation<{

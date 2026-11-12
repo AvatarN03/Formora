@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { ArrowRight, SlidersHorizontal } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { HeroInteractiveCanvas } from "@/components/hero-interactive-canvas";
+import { HeroInteractiveCanvas } from "@/components/marketing/hero-interactive-canvas";
 
 export function HeroSection() {
   const { isSignedIn } = useUser();

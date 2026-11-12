@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { publishForm } from "@/actions/form";
-import type { FormElementInstance } from "@/components/FormElements";
+import type { FormElementInstance } from "@/components/builder/FormElements";
 import { toast } from "@/components/ui/toast";
 
 export default function PublishFormBtn({

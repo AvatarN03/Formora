@@ -5,25 +5,25 @@ import type { Form } from "@prisma/client";
 import { ArrowLeft, Check, Pencil, X } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 
-import PreviewDialogBtn from "@/components/PreviewDialogBtn";
-import PublishFormBtn, { PublishedFormDialog } from "@/components/PublishFormBtn";
-import SaveFormBtn from "@/components/SaveFormBtn";
-import ResponsePolicyControl from "@/components/ResponsePolicyControl";
-import RateLimitControl from "@/components/RateLimitControl";
+import PreviewDialogBtn from "@/components/builder/PreviewDialogBtn";
+import PublishFormBtn, { PublishedFormDialog } from "@/components/builder/PublishFormBtn";
+import SaveFormBtn from "@/components/builder/SaveFormBtn";
+import ResponsePolicyControl from "@/components/builder/ResponsePolicyControl";
+import RateLimitControl from "@/components/builder/RateLimitControl";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { updateFormName, saveFormContent } from "@/actions/form";
-import Designer from "@/components/Designer";
-import DragOverlayWrapper from "@/components/DragOverlayWrapper";
+import Designer from "@/components/builder/Designer";
+import DragOverlayWrapper from "@/components/builder/DragOverlayWrapper";
 import {
   FormElements,
   type FormElementInstance,
-} from "@/components/FormElements";
-import FormPreview from "@/components/FormPreview";
+} from "@/components/builder/FormElements";
+import FormPreview from "@/components/builder/FormPreview";
 import {
   UnsavedChangesDialog,
   useUnsavedChangesGuard,
-} from "@/components/UnsavedChangesGuard";
+} from "@/components/builder/UnsavedChangesGuard";
 import { cn } from "cn";
 
 function readFormElements(content: string): FormElementInstance[] {

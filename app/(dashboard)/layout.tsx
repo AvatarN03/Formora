@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 export default async function DashboardLayout({
   children,
@@ -13,7 +13,16 @@ export default async function DashboardLayout({
   }
 
   const user = await currentUser();
-  const name = user?.fullName ?? user?.firstName ?? "Account";
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const name =
+    user.fullName ??
+    user.firstName ??
+    user.username ??
+    user.primaryEmailAddress?.emailAddress ??
+    "User";
 
   return (
     <div className="console-shell min-h-screen bg-background text-foreground">

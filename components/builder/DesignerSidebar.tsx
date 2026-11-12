@@ -4,8 +4,8 @@ import type {
   ElementsType,
   FormElement,
   FormElementInstance,
-} from "@/components/FormElements";
-import DesignerSidebarElement from "@/components/DesignerSidebarElement";
+} from "@/components/builder/FormElements";
+import DesignerSidebarElement from "@/components/builder/DesignerSidebarElement";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

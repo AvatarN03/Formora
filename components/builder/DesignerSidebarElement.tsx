@@ -4,7 +4,7 @@ import { cn } from "cn";
 import { GripVertical } from "lucide-react";
 import { useDraggable } from "@dnd-kit/react";
 
-import type { FormElement } from "@/components/FormElements";
+import type { FormElement } from "@/components/builder/FormElements";
 
 interface DesignerSidebarElementProps {
   formElement: FormElement;

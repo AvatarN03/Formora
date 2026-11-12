@@ -3,7 +3,7 @@
 import { useDroppable } from "@dnd-kit/react";
 import { cn } from "cn";
 
-import type { FormElement } from "@/components/FormElements";
+import type { FormElement } from "@/components/builder/FormElements";
 
 interface DesignerDropZoneProps {
   id: string;

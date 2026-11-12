@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 
-import { FormCollection, FormCollectionSkeleton } from "./_components/form-collection";
-import { StatsCards, StatsCardsSkeleton } from "./_components/stats-cards";
-import CreateForm from "./_components/createForm";
+import { FormCollection, FormCollectionSkeleton } from "@/components/forms/form-collection";
+import { StatsCards, StatsCardsSkeleton } from "@/components/forms/stats-cards";
+import CreateForm from "@/components/forms/createForm";
 
 export default async function ConsolePage() {
   const { userId } = await auth();
@@ -17,14 +17,14 @@ export default async function ConsolePage() {
       {/* Subtle Ambient Warm Glows */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -right-32 -z-10 size-[480px] rounded-full bg-gradient-to-br from-primary/[0.06] via-orange-400/[0.02] to-transparent blur-[130px]"
+        className="pointer-events-none absolute -top-32 -right-32 -z-10 size-120 rounded-full bg-linear-to-br from-primary/6 via-orange-400/2 to-transparent blur-[130px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 -left-32 -z-10 size-[420px] rounded-full bg-gradient-to-tr from-primary/[0.04] via-orange-400/[0.02] to-transparent blur-[120px]"
+        className="pointer-events-none absolute top-1/2 -left-32 -z-10 size-105 rounded-full bg-linear-to-tr from-primary/4 via-orange-400/2 to-transparent blur-[120px]"
       />
 
-      <div className="mx-auto max-w-[96rem] space-y-12 px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
+      <div className="mx-auto max-w-384 space-y-12 px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
         {/* Workspace Hero Header */}
         <div className="flex flex-col gap-6 border-b border-border/40 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>

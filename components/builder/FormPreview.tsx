@@ -3,7 +3,7 @@
 import type { Form } from "@prisma/client";
 import { ArrowLeft, CheckSquare, CircleDot, Hash, List, Tag } from "lucide-react";
 
-import type { FormElementInstance } from "@/components/FormElements";
+import type { FormElementInstance } from "@/components/builder/FormElements";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

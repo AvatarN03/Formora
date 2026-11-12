@@ -2,7 +2,7 @@ import React from 'react'
 
 import { getFormById } from '@/actions/form'
 
-import FormBuilder from '@/components/FormBuilder'
+import FormBuilder from '@/components/builder/FormBuilder'
 
 const FormBuilderPage = async ({
     params

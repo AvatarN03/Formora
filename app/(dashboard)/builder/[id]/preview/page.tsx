@@ -3,7 +3,7 @@ import { ArrowLeft, CheckSquare, CircleDot, Hash, List, Tag } from "lucide-react
 
 import { getFormById } from "@/actions/form";
 import { buttonVariants } from "@/components/ui/button";
-import type { FormElementInstance } from "@/components/FormElements";
+import type { FormElementInstance } from "@/components/builder/FormElements";
 
 function readText(element: FormElementInstance, key: string, fallback: string) {
   const value = element.extraAttributes?.[key];
