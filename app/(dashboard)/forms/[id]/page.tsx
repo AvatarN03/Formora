@@ -16,6 +16,8 @@ type ResponseColumn = {
   options: string[];
 };
 
+const CHOICE_TYPES = new Set(["Select", "Radio", "Checkbox"]);
+
 function getResponseColumns(content: string): ResponseColumn[] {
   try {
     const parsed: unknown = JSON.parse(content);
@@ -64,15 +66,15 @@ type ResponseInsight = ResponseColumn & {
 
 function getResponseInsights(
   columns: ResponseColumn[],
-  submissions: Array<{ content: string }>,
+  responses: Array<Record<string, unknown>>,
 ): ResponseInsight[] {
   return columns.map((column) => {
-    const values = submissions
-      .map((submission) => parseResponse(submission.content)[column.id])
+    const values = responses
+      .map((response) => response[column.id])
       .filter((value) => value !== undefined && value !== null && value !== "");
     const distribution = new Map<string, number>();
 
-    if (["Select", "Radio", "Checkbox"].includes(column.type)) {
+    if (CHOICE_TYPES.has(column.type)) {
       for (const option of column.options) distribution.set(option, 0);
     }
 
@@ -92,17 +94,23 @@ function getResponseInsights(
     const numericValues = values
       .map((value) => Number(value))
       .filter((value) => Number.isFinite(value));
-    const average = numericValues.length
-      ? numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length
-      : undefined;
+    const numericStats = numericValues.reduce(
+      (stats, value) => ({
+        sum: stats.sum + value,
+        min: Math.min(stats.min, value),
+        max: Math.max(stats.max, value),
+      }),
+      { sum: 0, min: Infinity, max: -Infinity },
+    );
+    const average = numericValues.length ? numericStats.sum / numericValues.length : undefined;
     const range = numericValues.length
-      ? `${Math.min(...numericValues)} – ${Math.max(...numericValues)}`
+      ? `${numericStats.min} – ${numericStats.max}`
       : undefined;
 
     return {
       ...column,
       answered: values.length,
-      total: submissions.length,
+      total: responses.length,
       distribution: sortedDistribution,
       average,
       range,
@@ -148,11 +156,12 @@ export default async function FormResponsesPage({
   }
 
   const columns = getResponseColumns(form.content);
-  const insights = getResponseInsights(columns, form.formSubmissions);
-  const locationGroups = new Map<string, string>();
+  const responses = form.formSubmissions.map((submission) => parseResponse(submission.content));
+  const insights = getResponseInsights(columns, responses);
+  const locationGroups = new Set<string>();
   const responseRecords = form.formSubmissions.map((submission) => {
-    if (submission.locationLabel && !locationGroups.has(submission.locationLabel)) {
-      locationGroups.set(submission.locationLabel, submission.locationLabel);
+    if (submission.locationLabel) {
+      locationGroups.add(submission.locationLabel);
     }
 
     return {
@@ -252,7 +261,7 @@ export default async function FormResponsesPage({
             <div className="mt-4 columns-1 gap-3 md:columns-2 xl:columns-3">
               {insights.map((insight, index) => {
                 const maxCount = insight.distribution[0]?.count ?? 1;
-                const isChoice = ["Select", "Radio", "Checkbox"].includes(insight.type);
+                const isChoice = CHOICE_TYPES.has(insight.type);
                 const isNumber = insight.type === "NumberField";
 
                 return (
