@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { ArrowRight } from "lucide-react";
-import { ThemeLogo } from "@/components/theme-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeLogo } from "@/components/custom/theme-logo";
+import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 
 export function MarketingHeader() {

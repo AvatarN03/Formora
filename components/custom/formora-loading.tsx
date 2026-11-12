@@ -1,4 +1,4 @@
-import { ThemeLogo } from "@/components/theme-logo";
+import { ThemeLogo } from "@/components/custom/theme-logo";
 
 export function FormoraLoading({ label = "Loading your workspace..." }: { label?: string }) {
   return (

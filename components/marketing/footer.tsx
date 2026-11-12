@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeLogo } from "@/components/theme-logo";
+import { ThemeLogo } from "@/components/custom/theme-logo";
 
 export function MarketingFooter() {
   return (

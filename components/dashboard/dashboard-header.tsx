@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
-import { ThemeLogo } from "@/components/theme-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeLogo } from "@/components/custom/theme-logo";
+import { ThemeToggle } from "@/components/custom/theme-toggle";
 
 interface DashboardHeaderProps {
   name: string;

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-import { ThemeLogo } from "@/components/theme-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeLogo } from "@/components/custom/theme-logo";
+import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { HeroInteractiveCanvas } from "@/components/marketing/hero-interactive-canvas";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

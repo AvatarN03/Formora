@@ -11,7 +11,7 @@ import SaveFormBtn from "@/components/builder/SaveFormBtn";
 import ResponsePolicyControl from "@/components/builder/ResponsePolicyControl";
 import RateLimitControl from "@/components/builder/RateLimitControl";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { updateFormName, saveFormContent } from "@/actions/form";
 import Designer from "@/components/builder/Designer";
 import DragOverlayWrapper from "@/components/builder/DragOverlayWrapper";
