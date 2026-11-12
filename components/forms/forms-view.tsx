@@ -17,6 +17,14 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import CreateForm from "./createForm";
@@ -178,45 +186,45 @@ export function FormsView({ forms }: FormsViewProps) {
       </div>
 
       {forms.length === 0 ? (
-        /* Empty State when no forms exist in the account */
-        <div className="py-16 px-6 text-center flex flex-col items-center justify-center">
-          <div className="size-12 rounded-2xl bg-card text-primary border border-border/60 shadow-xs flex items-center justify-center mb-4">
-            <FileText className="size-6" />
-          </div>
-          <h3 className="text-base font-semibold text-foreground">
-            No forms created yet
-          </h3>
-          <p className="text-xs text-muted-foreground max-w-sm mt-1.5 leading-relaxed">
-            Create your first form using our tactile drag-and-drop workspace, preview in real time, and share seamlessly.
-          </p>
-          <div className="mt-5">
+        <Empty className="min-h-72 rounded-none border-0 px-6 py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="size-12 rounded-2xl text-primary">
+              <FileText className="size-6" />
+            </EmptyMedia>
+            <EmptyTitle>No forms created yet</EmptyTitle>
+            <EmptyDescription>
+              Create your first form using our tactile drag-and-drop workspace, preview in real time, and share seamlessly.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
             <CreateForm />
-          </div>
-        </div>
+          </EmptyContent>
+        </Empty>
       ) : filteredForms.length === 0 ? (
-        /* Empty State when filtering yields 0 results */
-        <div className="py-16 px-6 text-center flex flex-col items-center justify-center">
-          <div className="size-10 rounded-xl bg-card text-muted-foreground border border-border/60 shadow-2xs flex items-center justify-center mb-3">
-            <Search className="size-4" />
-          </div>
-          <h3 className="text-sm font-semibold text-foreground">
-            No forms matching criteria
-          </h3>
-          <p className="text-xs text-muted-foreground max-w-xs mt-1">
-            {searchQuery
-              ? `No forms found matching "${searchQuery}".`
-              : `No forms currently in the ${activeTab} category.`}
-          </p>
-          <button
-            onClick={() => {
-              setActiveTab("all");
-              setSearchQuery("");
-            }}
-            className="mt-4 text-xs font-mono text-primary underline underline-offset-4 hover:opacity-80"
-          >
-            Reset filters
-          </button>
-        </div>
+        <Empty className="min-h-72 rounded-none border-0 px-6 py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="size-10 rounded-xl text-muted-foreground">
+              <Search className="size-4" />
+            </EmptyMedia>
+            <EmptyTitle className="text-sm">No forms matching criteria</EmptyTitle>
+            <EmptyDescription className="max-w-xs text-xs">
+              {searchQuery
+                ? `No forms found matching "${searchQuery}".`
+                : `No forms currently in the ${activeTab} category.`}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <button
+              onClick={() => {
+                setActiveTab("all");
+                setSearchQuery("");
+              }}
+              className="text-xs font-mono text-primary underline underline-offset-4 hover:opacity-80"
+            >
+              Reset filters
+            </button>
+          </EmptyContent>
+        </Empty>
       ) : (
         /* Form Cards Grid - with reduced rounding corners (rounded-xl) */
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
