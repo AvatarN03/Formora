@@ -8,6 +8,15 @@ type ResponseColumn = {
   label: string;
 };
 
+const RESPONSE_TYPES = new Set([
+  "TextField",
+  "NumberField",
+  "DatePicker",
+  "Select",
+  "Checkbox",
+  "Radio",
+]);
+
 function getResponseColumns(content: string): ResponseColumn[] {
   try {
     const parsed: unknown = JSON.parse(content);
@@ -23,9 +32,7 @@ function getResponseColumns(content: string): ResponseColumn[] {
 
       if (
         typeof item.id !== "string" ||
-        !["TextField", "NumberField", "DatePicker", "Select", "Checkbox", "Radio"].includes(
-          String(item.type),
-        )
+        !RESPONSE_TYPES.has(String(item.type))
       ) {
         return [];
       }
@@ -135,8 +142,13 @@ export async function GET(
   }
 
   const { id } = await params;
+  const formId = Number(id);
+  if (!Number.isSafeInteger(formId) || formId <= 0) {
+    return new NextResponse("Invalid form ID", { status: 400 });
+  }
+
   const form = await prisma.form.findFirst({
-    where: { id: Number(id), userId },
+    where: { id: formId, userId },
     select: {
       name: true,
       content: true,
@@ -156,18 +168,19 @@ export async function GET(
   const rows = form.formSubmissions.map((submission) => {
     const response = parseResponse(submission.content);
     return [
-      new Date(submission.createdAt).toISOString(),
+      submission.createdAt.toISOString(),
       ...columns.map((column) => formatValue(response[column.id])),
     ];
   });
-  const csv = [header, ...rows]
-    .map((row) => row.map((value) => escapeCsv(value)).join(","))
-    .join("\r\n");
-  const filename = `${form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "form"}-responses.csv`;
+  const filenameBase =
+    form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "form";
+  const format = new URL(request.url).searchParams.get("format");
 
-  if (new URL(request.url).searchParams.get("format") === "excel") {
+  if (format === "excel") {
+    const sheetName =
+      form.name.replace(/[\\/?*[\]:]/g, " ").slice(0, 31).trim() || "Responses";
     const workbook = createExcelWorkbook(
-      form.name.slice(0, 31) || "Responses",
+      sheetName,
       header,
       rows,
     );
@@ -175,16 +188,20 @@ export async function GET(
     return new NextResponse(workbook, {
       headers: {
         "Content-Type": "application/vnd.ms-excel; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${filename.replace(/\.csv$/, ".xls")}"`,
+        "Content-Disposition": `attachment; filename="${filenameBase}-responses.xls"`,
         "Cache-Control": "no-store",
       },
     });
   }
 
+  const csv = [header, ...rows]
+    .map((row) => row.map((value) => escapeCsv(value)).join(","))
+    .join("\r\n");
+
   return new NextResponse(`\uFEFF${csv}`, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Disposition": `attachment; filename="${filenameBase}-responses.csv"`,
       "Cache-Control": "no-store",
     },
   });
