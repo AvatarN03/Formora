@@ -17,6 +17,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Empty,
   EmptyContent,
@@ -235,7 +236,7 @@ export function FormsView({ forms }: FormsViewProps) {
                 : "0%";
 
             return (
-              <div
+              <Card
                 key={form.id}
                 className="rounded-xl border border-border/70 bg-card p-5 shadow-xs hover:border-primary/50 hover:shadow-md transition-all flex flex-col justify-between"
               >
@@ -331,7 +332,7 @@ export function FormsView({ forms }: FormsViewProps) {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
